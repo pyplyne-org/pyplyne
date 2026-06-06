@@ -1,0 +1,13 @@
+import polars as pl
+
+sales = df pl.DataFrame([
+  {"region": "north", "amount": 120},
+  {"region": "south", "amount": 80},
+  {"region": "north", "amount": 220},
+])
+
+large_sales = sales
+  |> where(amount > 100)
+  |> select(region, amount)
+
+print(large_sales)

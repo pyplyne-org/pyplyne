@@ -1,0 +1,247 @@
+{
+  "name": "pyplyne",
+  "displayName": "PyPlyne",
+  "description": "Syntax highlighting and interactive execution for PyPlyne pipeline files.",
+  "version": "0.1.1",
+  "publisher": "pyplyne",
+  "author": "Ben Brown",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/pyplyne-org/pyplyne#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pyplyne-org/pyplyne.git",
+    "directory": "editors/vscode-pyplyne"
+  },
+  "bugs": {
+    "url": "https://github.com/pyplyne-org/pyplyne/issues"
+  },
+  "main": "./extension.js",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [
+    "onLanguage:pyplyne",
+    "onCommand:pyplyne.startSession",
+    "onCommand:pyplyne.stopSession",
+    "onCommand:pyplyne.runSelection",
+    "onCommand:pyplyne.runCurrentLine",
+    "onCommand:pyplyne.runCurrentBlock",
+    "onCommand:pyplyne.runCurrentAssignmentAndShowResult",
+    "onCommand:pyplyne.runFile",
+    "onCommand:pyplyne.goToNextBlock",
+    "onCommand:pyplyne.goToPreviousBlock",
+    "onCommand:pyplyne.showShapes"
+  ],
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "pyplyne",
+        "aliases": [
+          "PyPlyne",
+          "pyplyne"
+        ],
+        "extensions": [
+          ".pyplyne"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "pyplyne",
+        "scopeName": "source.pyplyne",
+        "path": "./syntaxes/pyplyne.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "pyplyne.startSession",
+        "title": "PyPlyne: Start Session"
+      },
+      {
+        "command": "pyplyne.stopSession",
+        "title": "PyPlyne: Stop Session"
+      },
+      {
+        "command": "pyplyne.runSelection",
+        "title": "PyPlyne: Run Selection"
+      },
+      {
+        "command": "pyplyne.runCurrentLine",
+        "title": "PyPlyne: Run Current Line"
+      },
+      {
+        "command": "pyplyne.runCurrentBlock",
+        "title": "PyPlyne: Run Current Block"
+      },
+      {
+        "command": "pyplyne.runCurrentAssignmentAndShowResult",
+        "title": "PyPlyne: Run Current Assignment and Show Result"
+      },
+      {
+        "command": "pyplyne.runFile",
+        "title": "PyPlyne: Run Current File"
+      },
+      {
+        "command": "pyplyne.goToNextBlock",
+        "title": "PyPlyne: Go to Next Block"
+      },
+      {
+        "command": "pyplyne.goToPreviousBlock",
+        "title": "PyPlyne: Go to Previous Block"
+      },
+      {
+        "command": "pyplyne.showShapes",
+        "title": "PyPlyne: Show Session Shapes"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "pyplyne.startSession"
+        },
+        {
+          "command": "pyplyne.stopSession"
+        },
+        {
+          "command": "pyplyne.runSelection"
+        },
+        {
+          "command": "pyplyne.runCurrentLine"
+        },
+        {
+          "command": "pyplyne.runCurrentBlock"
+        },
+        {
+          "command": "pyplyne.runCurrentAssignmentAndShowResult"
+        },
+        {
+          "command": "pyplyne.runFile"
+        },
+        {
+          "command": "pyplyne.goToNextBlock"
+        },
+        {
+          "command": "pyplyne.goToPreviousBlock"
+        },
+        {
+          "command": "pyplyne.showShapes"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "pyplyne.runSelection",
+          "when": "editorLangId == pyplyne && editorHasSelection",
+          "group": "navigation@1"
+        },
+        {
+          "command": "pyplyne.runCurrentLine",
+          "when": "editorLangId == pyplyne",
+          "group": "navigation@2"
+        },
+        {
+          "command": "pyplyne.runCurrentBlock",
+          "when": "editorLangId == pyplyne",
+          "group": "navigation@3"
+        },
+        {
+          "command": "pyplyne.runCurrentAssignmentAndShowResult",
+          "when": "editorLangId == pyplyne",
+          "group": "navigation@4"
+        },
+        {
+          "command": "pyplyne.runFile",
+          "when": "editorLangId == pyplyne",
+          "group": "navigation@5"
+        },
+        {
+          "command": "pyplyne.goToNextBlock",
+          "when": "editorLangId == pyplyne",
+          "group": "navigation@6"
+        },
+        {
+          "command": "pyplyne.goToPreviousBlock",
+          "when": "editorLangId == pyplyne",
+          "group": "navigation@7"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "pyplyne.runSelection",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && editorLangId == pyplyne && editorHasSelection"
+      },
+      {
+        "command": "pyplyne.runCurrentLine",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && editorLangId == pyplyne && !editorHasSelection"
+      },
+      {
+        "command": "pyplyne.runCurrentBlock",
+        "key": "ctrl+shift+enter",
+        "mac": "cmd+shift+enter",
+        "when": "editorTextFocus && editorLangId == pyplyne"
+      },
+      {
+        "command": "pyplyne.runCurrentAssignmentAndShowResult",
+        "key": "ctrl+alt+shift+enter",
+        "mac": "cmd+alt+shift+enter",
+        "when": "editorTextFocus && editorLangId == pyplyne"
+      },
+      {
+        "command": "pyplyne.goToNextBlock",
+        "key": "ctrl+shift+down",
+        "mac": "cmd+shift+down",
+        "when": "editorTextFocus && editorLangId == pyplyne"
+      },
+      {
+        "command": "pyplyne.goToPreviousBlock",
+        "key": "ctrl+shift+up",
+        "mac": "cmd+shift+up",
+        "when": "editorTextFocus && editorLangId == pyplyne"
+      }
+    ],
+    "configuration": {
+      "title": "PyPlyne",
+      "properties": {
+        "pyplyne.executable": {
+          "type": "string",
+          "default": "uv",
+          "description": "Executable used to launch PyPlyne sessions."
+        },
+        "pyplyne.executableArgs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "run",
+            "pyplyne"
+          ],
+          "description": "Arguments inserted before PyPlyne subcommands. Use [] when pyplyne is installed directly on PATH."
+        },
+        "pyplyne.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "Host used by the PyPlyne session server."
+        },
+        "pyplyne.port": {
+          "type": "number",
+          "default": 8765,
+          "description": "Port used by the PyPlyne session server."
+        },
+        "pyplyne.startupTimeoutMs": {
+          "type": "number",
+          "default": 30000,
+          "description": "Milliseconds to wait for a started PyPlyne session server to become healthy."
+        }
+      }
+    }
+  }
+}

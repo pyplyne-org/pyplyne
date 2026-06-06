@@ -1,0 +1,26 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "pyplyne",
+      "camelcase": "PyPlyne",
+      "title": "PyPlyne",
+      "scope": "source.pyplyne",
+      "file-types": [
+        "pyplyne"
+      ],
+      "injection-regex": "^pyplyne$",
+      "class-name": "TreeSitterPyPlyne"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "description": "Tree-sitter grammar for PyPlyne.",
+    "authors": [
+      {
+        "name": "PyPlyne contributors"
+      }
+    ]
+  }
+}

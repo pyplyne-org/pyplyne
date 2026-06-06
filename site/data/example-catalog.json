@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Filter And Map A Sequence",
+    "file": "examples/list_pipeline.pyplyne",
+    "description": "Start here for a minimal sequence pipeline: annotate a list with `seq`, use `_` in `filter` and `map`, and print the resulting list.",
+    "concepts": ["runnable sequence pipeline", "seq annotation", "_ placeholder expressions", "filter()", "map()", "print() result"]
+  },
+  {
+    "title": "Transform Rows In A Table",
+    "file": "examples/tabular_pipeline.pyplyne",
+    "description": "Start here for table data: declare inline rows with `df`, filter by column names, add a computed column, and project selected fields.",
+    "concepts": ["runnable table pipeline", "df annotation", "where()", "mutate()", "select()", "computed columns"]
+  },
+  {
+    "title": "Wrap A Polars DataFrame",
+    "file": "examples/polars_constructor.pyplyne",
+    "description": "Use this when Python code already creates a Polars DataFrame: import `polars as pl`, mark the object as `df`, then continue with PyPlyne table verbs.",
+    "concepts": ["Python imports", "Polars interop", "pl.DataFrame construction", "df annotation", "table verbs"]
+  },
+  {
+    "title": "Convert Tables To Rows And Back",
+    "file": "examples/shape_conversions.pyplyne",
+    "description": "Use this when a table workflow needs row-wise sequence logic: convert a filtered table to rows, map or edit records, then rebuild a table.",
+    "concepts": ["shape conversion", "to_rows()", "sequence map", "set_fields()", "to_table()", "arrange()"]
+  },
+  {
+    "title": "Edit Record Fields",
+    "file": "examples/record_fields.pyplyne",
+    "description": "Use this for JSON-like row dictionaries: derive new fields, remove debug-only fields, and keep the final shape explicit.",
+    "concepts": ["record dictionaries", "set_fields()", "drop_fields()", "keep_fields()", "field projection"]
+  },
+  {
+    "title": "Run The Full Language Tour",
+    "file": "examples/full_language_tour.pyplyne",
+    "description": "Use this as an end-to-end smoke test: it combines imports, sequence and table verbs, grouped summaries, deferred pipelines, shape conversion, and CSV output.",
+    "concepts": ["end-to-end tour", "imports", "sequence verbs", "table verbs", "group_by() and summarize()", "defer pipeline", "write_csv() output"]
+  }
+]

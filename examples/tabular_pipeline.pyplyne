@@ -1,0 +1,12 @@
+rows = df [
+  {"region": "north", "amount": 120},
+  {"region": "south", "amount": 80},
+  {"region": "north", "amount": 220},
+]
+
+large_sales = rows
+  |> where(amount > 100)
+  |> mutate(double=amount * 2)
+  |> select(region, amount, double)
+
+print(large_sales)

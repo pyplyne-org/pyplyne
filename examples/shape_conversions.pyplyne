@@ -1,0 +1,20 @@
+sales = df [
+  {"region": "north", "amount": 120},
+  {"region": "south", "amount": 80},
+  {"region": "north", "amount": 220},
+]
+
+labels = sales
+  |> where(amount > 100)
+  |> to_rows()
+  |> map(_["region"])
+
+reviewed = sales
+  |> where(amount > 100)
+  |> to_rows()
+  |> set_fields(reviewed=True)
+  |> to_table()
+  |> arrange(region)
+
+print(labels)
+print(reviewed)

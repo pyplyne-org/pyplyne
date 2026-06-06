@@ -1,0 +1,98 @@
+start: program
+
+program: statement*
+
+?statement: import_stmt statement_end
+          | from_import_stmt statement_end
+          | assignment statement_end
+          | expr statement_end
+          | statement_end
+
+statement_end: _NL
+
+import_stmt: "import" import_alias ("," import_alias)*
+from_import_stmt: "from" dotted_name "import" import_alias ("," import_alias)*
+import_alias: dotted_name ("as" NAME)?
+
+assignment: NAME "=" expr
+
+?expr: shape_expr
+     | defer_expr
+     | arrow_lambda
+     | lambda_expr
+     | pipeline
+
+shape_expr: TYPE expr
+defer_expr: "defer" expr
+
+?pipeline: bool_or (_NL* "|>" _NL* pipe_target)*
+
+?pipe_target: method_pipe
+            | primary
+
+method_pipe: "." NAME "(" [arg_list] ")"
+
+?bool_or: bool_and ("or" bool_and)*
+?bool_and: bool_not ("and" bool_not)*
+?bool_not: "not" bool_not      -> not_expr
+         | comparison
+
+?comparison: arith (COMP_OP arith)*
+?arith: term (ADD_OP term)*
+?term: factor (MUL_OP factor)*
+?factor: ADD_OP factor          -> unary_expr
+       | primary
+
+lambda_expr: "fn" lambda_params ":" expr
+arrow_lambda: lambda_param_target "=>" expr
+?lambda_param_target: NAME              -> lambda_param_name
+                    | "(" lambda_params ")"
+lambda_params: NAME ("," NAME)*
+
+?primary: base trailer*
+
+?base: literal
+     | identifier
+     | list_literal
+     | tuple_literal
+     | dict_literal
+     | "(" expr ")"
+
+trailer: "." NAME                    -> attr_trailer
+       | "(" [arg_list] ")"          -> call_trailer
+       | "[" _NL* expr _NL* "]"      -> subscript_trailer
+
+arg_list: _NL* arg (_NL* "," _NL* arg)* _NL* ","? _NL*
+?arg: NAME "=" expr             -> keyword_arg
+    | expr                      -> positional_arg
+
+list_literal: "[" [arg_list] "]"
+tuple_literal: "(" arg _NL* "," [arg_list] ")"
+dict_literal: "{" [dict_entries] "}"
+dict_entries: _NL* dict_entry (_NL* "," _NL* dict_entry)* _NL* ","? _NL*
+dict_entry: expr ":" expr
+
+?literal: STRING                -> string
+        | SIGNED_NUMBER         -> number
+        | "True"                -> true
+        | "False"               -> false
+        | "None"                -> none
+
+identifier: NAME
+dotted_name: NAME ("." NAME)*
+
+COMP_OP: "==" | "!=" | "<=" | ">=" | "<" | ">"
+ADD_OP: "+" | "-"
+MUL_OP: "//" | "*" | "/" | "%"
+TYPE: /(?:df|seq)(?![A-Za-z0-9_])/
+
+%import common.CNAME -> NAME
+%import common.ESCAPED_STRING -> STRING
+%import common.SIGNED_NUMBER
+%import common.WS_INLINE
+
+COMMENT: /#[^\n]*/
+_NL: /(\r?\n)+/
+
+%ignore WS_INLINE
+%ignore COMMENT

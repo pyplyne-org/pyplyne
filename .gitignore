@@ -1,0 +1,13 @@
+.venv/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+*.tgz
+examples/full_language_tour_output.csv
+site-homepage*.png
+site/.docusaurus/
+site/build/
+site/node_modules/

@@ -1,0 +1,183 @@
+# PyPlyne
+
+> PyPlyne is a Python-friendly pipeline language for fast, readable data transformations over Polars tables and Python sequences.
+
+Use this file when helping someone install, write, run, debug, or embed PyPlyne.
+Prefer practical syntax and runtime guidance over implementation details.
+
+## Install And Run
+
+- Requires Python 3.13 or newer.
+- Package name and CLI command: `pyplyne`.
+- Until PyPlyne is published to PyPI, install from Git in the user's own project:
+  `uv add "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"`.
+- If the user is starting a new project, run `uv init --python 3.13` first.
+- If the user already has a Python project, run `uv add` from that project root.
+- With `pip`, install into an activated virtual environment:
+  `python -m pip install "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"`.
+- Run a file once with `uv run pyplyne script.pyplyne` or, from an activated
+  pip environment, `pyplyne script.pyplyne`.
+- For a first successful file, create a `.pyplyne` script that prints a result
+  and run it once before moving on to tables, files, or sessions.
+- Repository-only examples are useful references, but do not assume the user is
+  running from a PyPlyne source checkout.
+
+## Core Syntax
+
+PyPlyne code is ordinary-looking Python plus left-to-right pipe syntax. Files use
+the `.pyplyne` extension.
+
+- Shape annotations go on the right-hand side: `name = seq expression` or `name = df expression`.
+- `seq` means Python iterable data, especially lists and JSON-like records.
+- `df` means table-shaped data; PyPlyne normalizes it to a Polars DataFrame.
+- Pipe with `|>`: `source |> verb(args)`.
+- Once a variable is known as `seq` or `df`, later pipelines can start from it.
+- If a pipeline starts from an unshaped value, annotate the source with `seq` or `df`.
+- Convert explicitly between shapes with `to_rows()` and `to_table()`.
+- Imports work normally: `import polars as pl`, `from scoring import score_order`.
+
+## Table Pipelines
+
+Use `df` for Polars-backed table workflows. Bare identifiers inside table verbs
+are column expressions.
+
+```pyplyne
+sales = df read_csv("sales.csv")
+
+summary = sales
+  |> where(amount > 100)
+  |> group_by(region)
+  |> summarize(total = sum(amount), average = mean(amount))
+  |> arrange(total)
+```
+
+Common table verbs:
+
+- `where(expr)`: filter rows.
+- `mutate(name = expr, ...)`: add or replace columns.
+- `select(col, ...)`: project columns.
+- `group_by(col, ...)`: group rows for aggregation.
+- `summarize(name = aggregate, ...)`: aggregate grouped or whole-table data.
+- `arrange(col)`: sort.
+- `collect()`: use Polars' collection/materialization behavior.
+
+## Sequence Pipelines
+
+Use `seq` for Python iterables. In sequence callbacks, `_` is the current item.
+For multi-argument callbacks such as `reduce`, use `_1` and `_2`.
+
+```pyplyne
+numbers = seq [1, 2, 3, 4, 5, 6]
+
+result = numbers
+  |> filter(_ % 2 == 0)
+  |> map(_ * 10)
+```
+
+For JSON-like records, bare field names are convenient inside sequence verbs:
+
+```pyplyne
+orders = seq [
+  {"item": "coffee", "qty": 3},
+  {"item": "pens", "qty": 2},
+]
+
+restock = orders
+  |> filter(qty > 1)
+  |> keep_fields(item)
+  |> set_fields(buy = item == "pens")
+```
+
+Common sequence verbs:
+
+- `map(expr)`: transform every item.
+- `filter(expr)`: keep items whose expression is truthy.
+- `reduce(expr)`: collapse a sequence to one scalar.
+- `set_fields(name = expr, ...)`: add/replace fields on record dictionaries.
+- `drop_fields(field, ...)`: remove fields from record dictionaries.
+- `keep_fields(field, ...)`: project fields from record dictionaries.
+
+## Moving Between Tables And Sequences
+
+- `to_rows()` converts a `df` pipeline to a `seq` of row dictionaries.
+- `to_table()` converts a `seq` of row dictionaries to a Polars-backed `df`.
+- Use this boundary for row-wise Python functions, object logic, or JSON-style edits.
+
+```pyplyne
+reviewed = df read_csv("sales.csv")
+  |> where(amount > 100)
+  |> to_rows()
+  |> set_fields(reviewed=True)
+  |> to_table()
+  |> arrange(region)
+```
+
+## Python API
+
+Use `run(...)` for one isolated execution and `PyPlyneSession` for persistent
+state across many snippets.
+
+```python
+import polars as pl
+from pyplyne import run, PyPlyneSession
+
+sales = pl.DataFrame([
+    {"region": "north", "amount": 120},
+    {"region": "south", "amount": 80},
+])
+
+result = run("""
+summary = df sales
+  |> where(amount > 100)
+  |> select(region, amount)
+
+summary
+""", context={"sales": sales})
+
+summary = result.result
+```
+
+`PyPlyneSession` keeps variables, imports, known `seq`/`df` shapes, and the
+last expression result `_` alive. Use `session.get(name)`,
+`session.get_df(name)`, and `session.get_seq(name)` to retrieve live Python
+objects.
+
+## Error Guidance
+
+- Parse errors mean the source is not valid PyPlyne syntax.
+- Compile errors usually mean a shape/verb mismatch, such as using `where` on
+  `seq` data or `map` on `df` data.
+- Runtime errors come from the generated Python/Polars execution.
+- For agents, prefer `pyplyne send --json` or Python `raise_on_error=False`
+  so diagnostics can be inspected structurally.
+- If a pipeline has unknown shape, add `seq` or `df` at the source.
+- If a verb family is wrong, convert explicitly with `to_rows()` or `to_table()`.
+
+## Best Documentation To Fetch
+
+### Start Here
+
+- [PyPlyne Documentation](/docs/): Learn PyPlyne, a Python-native way to write clean functional pipes for Polars tables and JSON-like records.
+- [Quickstart](/docs/quickstart): Install PyPlyne in your own project and run your first pipeline.
+- [Core Concepts](/docs/concepts): The mental model for PyPlyne pipelines, shapes, execution, and Python interop.
+
+### Use The Language
+
+- [Language Guide](/docs/language-guide): Practical guide to writing PyPlyne pipelines.
+- [Sequence Patterns](/docs/sequence-patterns): Use PyPlyne seq pipelines with scalars, records, objects, functions, and mixed Python values.
+- [Examples](/docs/examples): Runnable PyPlyne examples included in the repository.
+- [Cookbook](/docs/cookbook): Task-shaped PyPlyne recipes for common data pipeline workflows.
+
+### Runtime Interfaces
+
+- [Interactive Sessions](/docs/interactive-sessions): Persistent REPL, session server, pyplyne send, and agent-facing workflows.
+- [Editor Support](/docs/editor): VS Code and Neovim support for PyPlyne files.
+
+### Reference
+
+- [Language Reference](/docs/reference): Compact reference for PyPlyne syntax, shapes, verbs, files, and imports.
+- [CLI Reference](/docs/cli): Commands for running scripts, starting sessions, and sending snippets.
+- [Generated CLI Help](/docs/generated-cli-reference): Command help generated from the current PyPlyne CLI implementation.
+- [Python API](/docs/python-api): Run PyPlyne from Python with PyPlyneSession, parse_source, and compile_ast.
+- [Generated Python API Reference](/docs/generated-python-api-reference): Public Python API signatures generated from the current PyPlyne package.
+- [Troubleshooting](/docs/troubleshooting): Common PyPlyne errors and how to fix them.

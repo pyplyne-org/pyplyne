@@ -1,0 +1,40 @@
+{
+  "name": "pyplyne-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "docs:api": "cd .. && uv run python site/scripts/generate_python_api_reference.py",
+    "docs:cli": "node scripts/generate-cli-reference.mjs",
+    "docs:examples": "node scripts/generate-example-docs.mjs",
+    "docs:llms": "node scripts/generate-llms.mjs",
+    "docs:generate": "npm run docs:examples && npm run docs:cli && npm run docs:api && npm run docs:llms",
+    "docs:highlighting": "node scripts/check-prism-pyplyne.mjs",
+    "docs:check": "npm run docs:generate && npm run docs:highlighting && node scripts/check-docs.mjs",
+    "docs:check:clean": "npm run docs:check && git -C .. diff --exit-code -- docs site/static/llms.txt",
+    "start": "npm run docs:generate && docusaurus start --host 127.0.0.1",
+    "build": "npm run docs:check && docusaurus build",
+    "serve": "docusaurus serve --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^3.8.1",
+    "@docusaurus/preset-classic": "^3.8.1",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@mdx-js/react": "^3.1.0",
+    "clsx": "^2.1.1",
+    "docusaurus-lunr-search": "^3.6.0",
+    "prism-pyplyne": "file:../packages/prism-pyplyne",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "^3.8.1"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.5",
+    "uuid": "^11.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

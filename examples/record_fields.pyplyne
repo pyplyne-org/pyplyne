@@ -1,0 +1,22 @@
+rows = seq [
+  {"region": "north", "amount": 120, "discount": 10, "debug": "a"},
+  {"region": "south", "amount": 80, "discount": 5, "debug": "b"},
+  {"region": "north", "amount": 220, "discount": 20, "debug": "c"},
+]
+
+with_fields = rows
+  |> set_fields(
+    net=amount - discount,
+    reviewed=amount > 100,
+    label=region + "-" + str(amount),
+  )
+
+without_debug = with_fields
+  |> drop_fields(debug)
+
+projected = without_debug
+  |> keep_fields(region, amount, net, reviewed, label)
+
+print(with_fields)
+print(without_debug)
+print(projected)

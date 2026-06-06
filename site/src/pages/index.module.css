@@ -1,0 +1,872 @@
+.hero {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(49, 130, 206, 0.16), transparent 26rem),
+    linear-gradient(135deg, #f7fbff 0%, #f4f0ea 46%, #eef7f2 100%);
+  border-bottom: 1px solid rgba(22, 38, 52, 0.12);
+}
+
+.heroInner {
+  box-sizing: border-box;
+  display: grid;
+  gap: 1.3rem;
+  margin: 0 auto;
+  max-width: 1180px;
+  min-height: calc(100dvh - var(--ifm-navbar-height) - 1.5rem);
+  padding: 1.7rem 1.5rem 1.6rem;
+}
+
+.heroCopy {
+  align-items: center;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(14rem, auto) minmax(18rem, 1fr) auto;
+}
+
+.brandLockup {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.heroCopy h1 {
+  color: #102230;
+  font-size: 4.15rem;
+  line-height: 0.95;
+  margin: 0;
+}
+
+.kicker,
+.sectionLabel {
+  color: #276749;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.lede {
+  color: #334155;
+  font-size: 1.03rem;
+  line-height: 1.42;
+  margin: 0;
+  max-width: 32rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+.installPanel {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(22, 38, 52, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 0.9rem 2.2rem rgba(16, 34, 48, 0.08);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1fr);
+  padding: 0.86rem 1rem;
+}
+
+.installCommand {
+  align-items: center;
+  background: #102230;
+  border-radius: 6px;
+  color: #f8fafc;
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.72rem 0.85rem;
+}
+
+.installCommand span {
+  color: #9fd9b5;
+  font-size: 0.68rem;
+  font-weight: 760;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.installCommand code {
+  background: transparent;
+  color: #f8fafc;
+  font-size: 0.98rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  padding: 0;
+}
+
+.installCopy {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.installCopy p {
+  color: #475569;
+  font-size: 0.86rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.installLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.8rem;
+}
+
+.installLinks a {
+  align-items: center;
+  color: #1f6f50;
+  display: inline-flex;
+  font-size: 0.84rem;
+  font-weight: 700;
+  gap: 0.32rem;
+  line-height: 1.2;
+  min-height: 1.35rem;
+}
+
+.installLinks img {
+  display: block;
+  flex: 0 0 auto;
+  height: 1.08rem;
+  width: 1.08rem;
+}
+
+.previewStack {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.previewCarousel {
+  display: grid;
+  gap: 0.72rem;
+  min-width: 0;
+}
+
+.previewControls {
+  display: none;
+}
+
+.preview {
+  background: #102230;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 1.8rem 4rem rgba(16, 34, 48, 0.22);
+  box-sizing: border-box;
+  color: #edf6f9;
+  display: grid;
+  grid-template-rows: 2rem minmax(5.85rem, max-content) minmax(2.15rem, max-content) 1fr;
+  min-height: 20.9rem;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.previewHeader {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cde7dc;
+  display: flex;
+  font-size: 0.74rem;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 0 0.78rem;
+}
+
+.preview pre {
+  background: transparent;
+  border-radius: 0;
+  color: #f8fafc;
+  font-size: 0.78rem;
+  line-height: 1.36;
+  margin: 0;
+  padding: 0.78rem;
+  white-space: pre-wrap;
+}
+
+.demoCode {
+  overflow: visible;
+}
+
+.demoCode code {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.preview :global(.token.keyword),
+.preview :global(.token.shape-keyword),
+.benefitSection :global(.token.keyword) {
+  color: #76d19b;
+}
+
+.preview :global(.token.function),
+.benefitSection :global(.token.function) {
+  color: #7dd3fc;
+}
+
+.preview :global(.token.operator),
+.benefitSection :global(.token.operator) {
+  color: #facc15;
+}
+
+.preview :global(.token.string),
+.benefitSection :global(.token.string) {
+  color: #fda4af;
+}
+
+.preview :global(.token.number),
+.benefitSection :global(.token.number) {
+  color: #c4b5fd;
+}
+
+.preview :global(.token.parameter),
+.benefitSection :global(.token.parameter) {
+  color: #f0abfc;
+}
+
+.preview :global(.token.punctuation),
+.benefitSection :global(.token.punctuation),
+.preview :global(.token.comment),
+.benefitSection :global(.token.comment) {
+  color: #94a3b8;
+}
+
+.preview :global(.token.variable),
+.benefitSection :global(.token.variable) {
+  color: #e2e8f0;
+}
+
+.codeLine {
+  border-radius: 4px;
+  min-height: 0.96rem;
+  min-width: 0;
+  opacity: 1;
+  overflow-wrap: anywhere;
+  padding: 0 0.26rem;
+  transition: background-color 220ms ease, color 220ms ease, opacity 220ms ease;
+}
+
+.activeCodeLine {
+  background: rgba(118, 209, 155, 0.18);
+  color: #ffffff;
+}
+
+.pendingCodeLine {
+  opacity: 0.26;
+}
+
+.demoCaption {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cde7dc;
+  display: flex;
+  font-size: 0.73rem;
+  line-height: 1.25;
+  padding: 0 0.8rem;
+}
+
+.dataFlow {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+  padding: 0.62rem 0.72rem 0.78rem;
+}
+
+.dataPanel {
+  background: #f8fafc;
+  border-radius: 6px;
+  color: #1f2937;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dataPanel p {
+  background: #e7f0ed;
+  border-bottom: 1px solid #dbe3ea;
+  color: #173f35;
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+  padding: 0.28rem 0.42rem;
+  text-transform: uppercase;
+}
+
+.miniTable {
+  display: grid;
+  font-size: 0.68rem;
+}
+
+.miniTableHead,
+.miniTableRow {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 2), minmax(0, 1fr));
+}
+
+.miniTableHead span,
+.miniTableRow span {
+  border-bottom: 1px solid #dbe3ea;
+  overflow: hidden;
+  padding: 0.24rem 0.38rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.miniTableHead {
+  color: #475569;
+  font-weight: 700;
+}
+
+.miniTableRow,
+.recordRow {
+  transition: opacity 220ms ease, filter 220ms ease;
+}
+
+.groupedTableRow {
+  border-left: 0.24rem solid transparent;
+}
+
+.groupedTableRow[data-group='A'] {
+  background: #ecfdf5;
+  border-left-color: #34d399;
+}
+
+.groupedTableRow[data-group='B'] {
+  background: #eff6ff;
+  border-left-color: #60a5fa;
+}
+
+.groupedTableRow[data-group='C'] {
+  background: #fefce8;
+  border-left-color: #facc15;
+}
+
+.dimmedDataRow {
+  filter: grayscale(1);
+  opacity: 0.32;
+}
+
+.recordList {
+  display: grid;
+  gap: 0.26rem;
+  padding: 0.36rem;
+}
+
+.recordRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.18rem;
+  min-height: 1rem;
+}
+
+.fieldPill,
+.scalarValue {
+  background: #eaf4ff;
+  border-radius: 4px;
+  color: #15344a;
+  display: inline-flex;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.6rem;
+  gap: 0.18rem;
+  line-height: 1.15;
+  padding: 0.2rem 0.25rem;
+}
+
+.fieldPill b {
+  color: #21583f;
+}
+
+.featureBand,
+.benefitBand {
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 3.25rem 1.5rem;
+}
+
+.featureGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.featureCard {
+  border: 1px solid #d8e0e7;
+  border-radius: 8px;
+  color: inherit;
+  display: grid;
+  gap: 0.55rem;
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+
+.featureCard:hover {
+  border-color: #3182ce;
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.featureCard h2 {
+  color: #102230;
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.featureCard p {
+  color: #475569;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.featureCard .featureLabel {
+  color: #276749;
+  font-size: 0.72rem;
+  font-weight: 760;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.benefitBand {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 3rem;
+}
+
+.sectionIntro {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(10rem, 0.38fr) minmax(0, 1fr);
+  margin-bottom: 1.15rem;
+}
+
+.sectionIntro h2 {
+  color: #102230;
+  font-size: 1.85rem;
+  line-height: 1.1;
+  margin: 0;
+  max-width: 42rem;
+}
+
+.benefitStack {
+  display: grid;
+  gap: 1rem;
+}
+
+.benefitSection {
+  align-items: stretch;
+  border: 1px solid #d8e0e7;
+  border-radius: 8px;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 0.95fr) minmax(20rem, 1.05fr);
+  padding: 1rem;
+}
+
+.benefitCopy {
+  align-content: start;
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.15rem 0.15rem 0.15rem 0;
+}
+
+.benefitLabel {
+  color: #276749;
+  font-size: 0.74rem;
+  font-weight: 760;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.benefitSection h3 {
+  color: #102230;
+  font-size: 1.42rem;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.benefitSection p {
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.benefitSection ul {
+  color: #334155;
+  display: grid;
+  gap: 0.28rem;
+  line-height: 1.45;
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
+}
+
+.benefitSection li::marker {
+  color: #2f855a;
+}
+
+.textLink {
+  color: #1f6f50;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.benefitSection pre {
+  align-self: stretch;
+  background: #102230;
+  border-radius: 8px;
+  color: #f8fafc;
+  display: grid;
+  font-size: 0.8rem;
+  line-height: 1.42;
+  margin: 0;
+  min-height: 11rem;
+  overflow: auto;
+  padding: 0.85rem;
+  white-space: pre-wrap;
+}
+
+.workflowCodeStack {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.workflowCodeStack pre {
+  min-height: auto;
+}
+
+.workflowCodeStack pre:first-child {
+  min-height: 13.5rem;
+}
+
+.workflowCodeStack pre:not(:first-child) {
+  font-size: 0.78rem;
+  padding: 0.7rem 0.85rem;
+}
+
+:global(html[data-theme='dark']) .hero {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(77, 171, 247, 0.12), transparent 26rem),
+    linear-gradient(135deg, #07141b 0%, #111820 48%, #0d1b18 100%);
+  border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+:global(html[data-theme='dark']) .heroCopy h1,
+:global(html[data-theme='dark']) .featureCard h2,
+:global(html[data-theme='dark']) .sectionIntro h2,
+:global(html[data-theme='dark']) .benefitSection h3 {
+  color: #eef5f8;
+}
+
+:global(html[data-theme='dark']) .kicker,
+:global(html[data-theme='dark']) .sectionLabel,
+:global(html[data-theme='dark']) .featureCard .featureLabel,
+:global(html[data-theme='dark']) .benefitLabel {
+  color: #8ee0b5;
+}
+
+:global(html[data-theme='dark']) .lede,
+:global(html[data-theme='dark']) .featureCard p,
+:global(html[data-theme='dark']) .benefitSection p,
+:global(html[data-theme='dark']) .benefitSection ul {
+  color: #c8d3dc;
+}
+
+:global(html[data-theme='dark']) :global(main) {
+  background: #0b151c;
+}
+
+:global(html[data-theme='dark']) .featureCard,
+:global(html[data-theme='dark']) .benefitSection,
+:global(html[data-theme='dark']) .installPanel {
+  background: #101b24;
+  border-color: #26384a;
+}
+
+:global(html[data-theme='dark']) .benefitBand {
+  border-top-color: #26384a;
+}
+
+:global(html[data-theme='dark']) .textLink {
+  color: #8ee0b5;
+}
+
+:global(html[data-theme='dark']) .installCopy p {
+  color: #c8d3dc;
+}
+
+:global(html[data-theme='dark']) .installLinks a {
+  color: #8ee0b5;
+}
+
+:global(html[data-theme='dark']) .preview {
+  background: #0e1c26;
+  border-color: #26384a;
+  box-shadow: 0 1.8rem 4rem rgba(0, 0, 0, 0.34);
+}
+
+:global(html[data-theme='dark']) .previewHeader,
+:global(html[data-theme='dark']) .demoCaption {
+  background: rgba(205, 231, 220, 0.08);
+}
+
+:global(html[data-theme='dark']) .dataPanel {
+  background: #111c24;
+  border: 1px solid #26384a;
+  color: #dce7ed;
+}
+
+:global(html[data-theme='dark']) .dataPanel p {
+  background: #182631;
+  border-bottom-color: #26384a;
+  color: #cde7dc;
+}
+
+:global(html[data-theme='dark']) .miniTableHead {
+  color: #b8c6d0;
+}
+
+:global(html[data-theme='dark']) .miniTableHead span,
+:global(html[data-theme='dark']) .miniTableRow span {
+  border-bottom-color: #26384a;
+}
+
+:global(html[data-theme='dark']) .groupedTableRow[data-group='A'] {
+  background: rgba(52, 211, 153, 0.15);
+}
+
+:global(html[data-theme='dark']) .groupedTableRow[data-group='B'] {
+  background: rgba(96, 165, 250, 0.14);
+}
+
+:global(html[data-theme='dark']) .groupedTableRow[data-group='C'] {
+  background: rgba(250, 204, 21, 0.12);
+}
+
+:global(html[data-theme='dark']) .fieldPill,
+:global(html[data-theme='dark']) .scalarValue {
+  background: #172432;
+  color: #dce7ed;
+}
+
+:global(html[data-theme='dark']) .fieldPill b {
+  color: #8ee0b5;
+}
+
+@media (max-height: 760px) and (min-width: 980px) {
+  .heroInner {
+    gap: 1rem;
+    padding-bottom: 1.1rem;
+    padding-top: 1.15rem;
+  }
+
+  .heroCopy h1 {
+    font-size: 3.65rem;
+  }
+
+  .kicker,
+  .sectionLabel {
+    margin-bottom: 0.5rem;
+  }
+
+  .lede {
+    font-size: 0.98rem;
+  }
+
+  .actions {
+    gap: 0.55rem;
+  }
+
+  .installPanel {
+    padding: 0.72rem 0.82rem;
+  }
+
+  .preview {
+    box-shadow: 0 1rem 2.6rem rgba(16, 34, 48, 0.18);
+    grid-template-rows: 1.85rem minmax(5.45rem, max-content) minmax(2rem, max-content) 1fr;
+    min-height: 19.6rem;
+  }
+
+  .preview pre {
+    font-size: 0.72rem;
+  }
+
+  .dataFlow {
+    padding-bottom: 0.65rem;
+  }
+}
+
+@media (max-width: 920px) {
+  .heroInner {
+    min-height: auto;
+  }
+
+  .heroCopy {
+    align-items: start;
+    grid-template-columns: 1fr auto;
+  }
+
+  .lede {
+    grid-column: 1 / -1;
+    max-width: 44rem;
+  }
+
+  .installPanel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .previewStack {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
+  .previewStack:focus-visible {
+    outline: 2px solid #76d19b;
+    outline-offset: 4px;
+  }
+
+  .preview {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+  }
+
+  .previewControls {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .previewControlButton {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(16, 34, 48, 0.18);
+    border-radius: 999px;
+    color: #173f35;
+    cursor: pointer;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 4rem;
+    padding: 0.58rem 0.75rem;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+  }
+
+  .previewControlButton:hover,
+  .previewControlButton:focus-visible {
+    background: #ffffff;
+    border-color: #2f855a;
+    color: #102230;
+  }
+
+  .previewControlButton:focus-visible,
+  .previewIndicator:focus-visible {
+    outline: 2px solid #276749;
+    outline-offset: 3px;
+  }
+
+  .previewIndicators {
+    align-items: center;
+    display: flex;
+    gap: 0.45rem;
+  }
+
+  .previewIndicator {
+    background: rgba(16, 34, 48, 0.28);
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    height: 0.55rem;
+    padding: 0;
+    transition: background-color 120ms ease, transform 120ms ease, width 120ms ease;
+    width: 0.55rem;
+  }
+
+  .activePreviewIndicator {
+    background: #276749;
+    transform: scale(1.08);
+    width: 1.35rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .heroInner {
+    padding-top: 2rem;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionIntro,
+  .benefitSection {
+    grid-template-columns: 1fr;
+  }
+
+  .benefitCopy {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .heroCopy {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCopy h1 {
+    font-size: 3.2rem;
+  }
+
+  .lede {
+    font-size: 1.02rem;
+  }
+
+  .actions {
+    justify-content: flex-start;
+    margin-top: 1rem;
+  }
+
+  .installPanel {
+    gap: 0.75rem;
+  }
+
+  .installCommand code {
+    font-size: 0.9rem;
+  }
+
+  .previewStack {
+    gap: 0.7rem;
+  }
+
+  .preview pre {
+    font-size: 0.78rem;
+  }
+
+  .preview {
+    grid-template-rows: 2rem auto auto 1fr;
+    min-height: 21.4rem;
+  }
+
+  .dataFlow {
+    gap: 0.45rem;
+  }
+
+  .fieldPill,
+  .scalarValue {
+    font-size: 0.55rem;
+  }
+}
