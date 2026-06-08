@@ -4,6 +4,12 @@
 
 # PyPlyne
 
+<p align="center">
+  <a href="https://github.com/pyplyne-org/pyplyne/actions/workflows/ci.yml">
+    <img src="https://github.com/pyplyne-org/pyplyne/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status">
+  </a>
+</p>
+
 PyPlyne brings clean functional pipes directly to Python, so data transformations
 read left to right without leaving the Python runtime.
 
