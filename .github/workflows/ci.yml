@@ -53,7 +53,7 @@ jobs:
           uv run ruff format --check .
 
       - name: Run tests
-        run: uv run pytest
+        run: uv run pytest --cov=pyplyne --cov-report=term-missing
 
       - name: Build package
         run: uv build
