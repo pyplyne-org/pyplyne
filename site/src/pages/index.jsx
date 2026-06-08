@@ -83,6 +83,7 @@ const workflowSections = [
     ],
     href: '/docs/quickstart',
     linkLabel: 'Read the quickstart',
+    codeLabel: 'pipeline.pyplyne',
     language: 'pyplyne',
     code: `from pathlib import Path
 
@@ -94,6 +95,7 @@ summary = sales
 
 print(summary)
 summary`,
+    commandLabel: 'terminal',
     command: 'uv run pyplyne pipeline.pyplyne',
   },
   {
@@ -107,6 +109,7 @@ summary`,
     ],
     href: '/docs/python-api',
     linkLabel: 'See the Python API',
+    codeLabel: 'python',
     language: 'python',
     code: `import polars as pl
 from pyplyne import run
@@ -138,6 +141,7 @@ print(summary)`,
     ],
     href: '/docs/editor',
     linkLabel: 'Set up VS Code',
+    codeLabel: 'large_sales.pyplyne',
     language: 'pyplyne',
     code: `sales = df read_csv("sales.csv")
 
@@ -158,15 +162,17 @@ large_sales`,
     ],
     href: '/docs/interactive-sessions#agent-iteration-loop',
     linkLabel: 'See the agent loop',
+    codeLabel: 'terminal',
     language: 'bash',
     code: `uv run pyplyne serve --port 8765 --load setup.pyplyne
 
-uv run pyplyne send --json --expr 'sales'
-uv run pyplyne send --json --expr '
-df sales
+uv run pyplyne send --json <<'PYPLYNE'
+summary = df sales
   |> group_by(region)
   |> summarize(total = sum(amount))
-'`,
+
+summary
+PYPLYNE`,
   },
 ];
 
@@ -289,6 +295,18 @@ function HighlightedPre({code, language}) {
         dangerouslySetInnerHTML={{__html: highlightedHtml(code, language)}}
       />
     </pre>
+  );
+}
+
+function LabeledCodeBlock({label, code, language, className}) {
+  return (
+    <div className={clsx(styles.workflowCodeBlock, className)}>
+      {label ? <span className={styles.workflowCodeLabel}>{label}</span> : null}
+      <HighlightedPre
+        code={code}
+        language={language}
+      />
+    </div>
   );
 }
 
@@ -686,13 +704,17 @@ export default function Home() {
                   </Link>
                 </div>
                 <div className={styles.workflowCodeStack}>
-                  <HighlightedPre
+                  <LabeledCodeBlock
+                    className={styles.workflowPrimaryCode}
                     code={workflow.code}
+                    label={workflow.codeLabel}
                     language={workflow.language}
                   />
                   {workflow.command ? (
-                    <HighlightedPre
+                    <LabeledCodeBlock
+                      className={styles.workflowCommandCode}
                       code={workflow.command}
+                      label={workflow.commandLabel}
                       language="bash"
                     />
                   ) : null}

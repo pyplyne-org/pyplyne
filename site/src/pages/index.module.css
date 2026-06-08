@@ -643,20 +643,38 @@
 }
 
 .workflowCodeStack {
+  align-content: start;
   display: grid;
   gap: 0.65rem;
   min-width: 0;
 }
 
-.workflowCodeStack pre {
+.workflowCodeBlock {
+  align-content: start;
+  display: grid;
+  min-width: 0;
+}
+
+.workflowCodeLabel {
+  align-items: center;
+  background: #0b1d29;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px 8px 0 0;
+  color: #b8d7cd;
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.46rem 0.85rem;
+}
+
+.workflowCodeBlock pre {
+  border-radius: 0 0 8px 8px;
+  display: block;
   min-height: auto;
 }
 
-.workflowCodeStack pre:first-child {
-  min-height: 13.5rem;
-}
-
-.workflowCodeStack pre:not(:first-child) {
+.workflowCommandCode pre {
   font-size: 0.78rem;
   padding: 0.7rem 0.85rem;
 }
