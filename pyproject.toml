@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=77", "wheel"]
+requires = ["setuptools>=80", "setuptools-scm>=8", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyplyne"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A lightweight data transformation DSL compiled through native CPython AST nodes."
 authors = [
   {name = "Ben Brown"},
@@ -54,3 +54,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 pyplyne = ["grammar.lark"]
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"
