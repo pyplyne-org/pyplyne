@@ -122,7 +122,12 @@ def _send_command(argv: list[str]) -> int:
     parser.add_argument("--host", default=DEFAULT_HOST, help="Host to use when --url and PYPLYNE_URL are unset")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Port to use when --url and PYPLYNE_URL are unset")
     parser.add_argument("--json", action="store_true", help="Request structured JSON output")
-    parser.add_argument("--filename", help="Virtual filename to use in session tracebacks")
+    parser.add_argument(
+        "--source-name",
+        "--filename",
+        dest="filename",
+        help="Virtual source name to use in session diagnostics and tracebacks",
+    )
     parser.add_argument("--timeout", type=float, default=30, help="Request timeout in seconds")
     args = parser.parse_args(argv)
 

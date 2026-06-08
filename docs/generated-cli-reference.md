@@ -67,20 +67,22 @@ options:
 
 ```text title="pyplyne send --help"
 usage: pyplyne send [-h] [--expr EXPR | --file FILE] [--url URL] [--host HOST]
-                    [--port PORT] [--json] [--filename FILENAME]
+                    [--port PORT] [--json] [--source-name FILENAME]
                     [--timeout TIMEOUT]
 
 Send PyPlyne source to a persistent session.
 
 options:
-  -h, --help           show this help message and exit
-  --expr EXPR          PyPlyne source to send
-  --file FILE          Read PyPlyne source from a file
-  --url URL            Session server URL. Defaults to PYPLYNE_URL or
-                       http://127.0.0.1:8765
-  --host HOST          Host to use when --url and PYPLYNE_URL are unset
-  --port PORT          Port to use when --url and PYPLYNE_URL are unset
-  --json               Request structured JSON output
-  --filename FILENAME  Virtual filename to use in session tracebacks
-  --timeout TIMEOUT    Request timeout in seconds
+  -h, --help            show this help message and exit
+  --expr EXPR           PyPlyne source to send
+  --file FILE           Read PyPlyne source from a file
+  --url URL             Session server URL. Defaults to PYPLYNE_URL or
+                        http://127.0.0.1:8765
+  --host HOST           Host to use when --url and PYPLYNE_URL are unset
+  --port PORT           Port to use when --url and PYPLYNE_URL are unset
+  --json                Request structured JSON output
+  --source-name, --filename FILENAME
+                        Virtual source name to use in session diagnostics and
+                        tracebacks
+  --timeout TIMEOUT     Request timeout in seconds
 ```

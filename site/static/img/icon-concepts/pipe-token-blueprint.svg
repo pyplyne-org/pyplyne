@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
-  <title id="title">PyPlyne</title>
+  <title id="title">PyPlyne pipe token blueprint concept</title>
   <desc id="desc">A dark blue tile with a cool blueprint-style pipe token.</desc>
   <rect width="64" height="64" rx="14" fill="#0b1f2a"/>
   <path d="M22 17v30" fill="none" stroke="#7dd3fc" stroke-width="8" stroke-linecap="round"/>

@@ -616,6 +616,41 @@ def test_send_cli_sends_expression_to_port_override(capsys):
     assert second.err == ""
 
 
+def test_send_cli_source_name_sets_virtual_diagnostic_filename(capsys):
+    server = create_session_server("127.0.0.1", 0)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    host, port = server.server_address
+
+    try:
+        assert (
+            main(
+                [
+                    "send",
+                    "--host",
+                    host,
+                    "--port",
+                    str(port),
+                    "--json",
+                    "--source-name",
+                    "agent-step-01.pyplyne",
+                    "--expr",
+                    "numbers = seq [1, 2]",
+                ]
+            )
+            == 0
+        )
+        output = capsys.readouterr()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+    payload = json.loads(output.out)
+    assert payload["filename"] == "agent-step-01.pyplyne"
+    assert output.err == ""
+
+
 def test_send_cli_returns_nonzero_and_stderr_for_server_errors(capsys):
     server = create_session_server("127.0.0.1", 0)
     thread = threading.Thread(target=server.serve_forever, daemon=True)

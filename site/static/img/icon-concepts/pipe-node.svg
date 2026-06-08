@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">PyPlyne pipe node icon concept</title>
+  <desc id="desc">A pipeline path with three processing nodes and a rightward arrow.</desc>
+  <rect width="64" height="64" rx="14" fill="#102230"/>
+  <path d="M16 32h32" fill="none" stroke="#7dd3fc" stroke-width="7" stroke-linecap="round"/>
+  <path d="M41 25l7 7-7 7" fill="none" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="18" cy="32" r="7" fill="#8ee0b5"/>
+  <circle cx="32" cy="32" r="7" fill="#8ee0b5"/>
+  <circle cx="46" cy="32" r="7" fill="#276749"/>
+</svg>

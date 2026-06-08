@@ -148,16 +148,16 @@ large_sales = sales
 large_sales`,
   },
   {
-    label: 'Let agents iterate',
-    title: 'Give AI agents a warm session for efficient data exploration.',
-    text: 'Start a small session server, load big data once, then let an agent send focused snippets and inspect JSON responses without rerunning the full pipeline.',
+    label: 'Agent iteration loop',
+    title: 'Let agents refine pipelines against warm data.',
+    text: 'Keep imports, helpers, and loaded data in one PyPlyne session so an agent can send small snippets, read structured feedback, and keep improving the transformation.',
     points: [
-      'Keep large datasets and Python helpers resident in memory.',
-      'Return structured feedback with result, diagnostic, and shape metadata.',
-      'Refine transformations step by step over SSH or a local port.',
+      'Preload expensive setup once with --load.',
+      'Return JSON with result, diagnostics, traceback, and shape metadata.',
+      'Use stable source names so errors point back to each agent step.',
     ],
-    href: '/docs/interactive-sessions#remote-or-agent-workflows',
-    linkLabel: 'Read agent workflow docs',
+    href: '/docs/interactive-sessions#agent-iteration-loop',
+    linkLabel: 'See the agent loop',
     language: 'bash',
     code: `uv run pyplyne serve --port 8765 --load setup.pyplyne
 
@@ -295,12 +295,11 @@ function HighlightedPre({code, language}) {
 function InstallPanel() {
   return (
     <section className={styles.installPanel} aria-label="Install PyPlyne">
-      <div className={styles.installCommand}>
-        <span>Install</span>
-        <code>uv add "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"</code>
-      </div>
-      <div className={styles.installCopy}>
-        <p>Requires Python 3.13+. Use the Git source install until the PyPI package is published.</p>
+      <div className={styles.installSetup}>
+        <div className={styles.installCommand}>
+          <span>Install</span>
+          <code>uv add "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"</code>
+        </div>
         <nav className={styles.installLinks} aria-label="PyPlyne setup links">
           {installLinks.map((link) => (
             <Link to={link.href} key={link.href}>
@@ -311,6 +310,9 @@ function InstallPanel() {
             </Link>
           ))}
         </nav>
+      </div>
+      <div className={styles.installCopy}>
+        <p>Requires Python 3.13+. Use the Git source install until the PyPI package is published.</p>
       </div>
     </section>
   );
@@ -565,11 +567,15 @@ function HomepageHeader() {
             JSON-like records, without leaving Python.
           </p>
           <div className={styles.actions}>
-            <Link className="button button--primary" to="/docs/language-guide">
-              Read the guide
+            <Link
+              className={clsx(styles.heroButton, styles.primaryHeroButton)}
+              to="/docs/language-guide">
+              <span>Read the guide</span>
             </Link>
-            <Link className="button button--secondary" to="/docs/reference">
-              Open reference
+            <Link
+              className={clsx(styles.heroButton, styles.secondaryHeroButton)}
+              to="/docs/reference">
+              <span>Open reference</span>
             </Link>
           </div>
         </section>

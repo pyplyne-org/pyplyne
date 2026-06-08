@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">PyPlyne pipe loop icon concept</title>
+  <desc id="desc">A rounded dark square with a green and blue pipe loop forming a compact pipeline mark.</desc>
+  <rect width="64" height="64" rx="14" fill="#102230"/>
+  <path d="M17 21h21a9 9 0 0 1 0 18H27" fill="none" stroke="#8ee0b5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M27 39h-7a6 6 0 0 1 0-12h4" fill="none" stroke="#7dd3fc" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M41 30l6 6-6 6" fill="none" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

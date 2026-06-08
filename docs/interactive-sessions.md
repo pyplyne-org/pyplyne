@@ -120,11 +120,12 @@ uv run pyplyne send --url http://127.0.0.1:9000/run --expr 'numbers'
 PYPLYNE_URL=http://127.0.0.1:9000 uv run pyplyne send --expr 'numbers'
 ```
 
-Use `--filename` for piped or expression source when you want diagnostics to
-point at a stable virtual filename:
+Optionally use `--source-name` for piped, generated, or expression source when you want
+diagnostics to point at a stable virtual source name. This names the snippet for
+errors; it does not read a file:
 
 ```bash
-uv run pyplyne send --filename agent-step-03.pyplyne --expr 'numbers |> map(_ + missing)'
+uv run pyplyne send --source-name agent-step-03.pyplyne --expr 'numbers |> map(_ + missing)'
 ```
 
 Use `--timeout` to change the client request timeout from the default 30
@@ -176,29 +177,54 @@ lossless JSON serialization of every Python object. Use it for display,
 inspection, and lightweight agent feedback. Keep durable data in named session
 variables or write it with PyPlyne/Python helpers.
 
-## Remote Or Agent Workflows
+## Agent Iteration Loop
 
-The server binds to a host and port, so it can be used over SSH port
-forwarding:
+Agents are most useful when they can make small, observable changes without
+paying the setup cost every turn. A PyPlyne session gives them that loop: load
+imports, helpers, and data once, then send focused snippets into the same live
+Python process.
 
 ```bash
-ssh -L 8765:127.0.0.1:8765 user@remote
-PYPLYNE_URL=http://127.0.0.1:8765 uv run pyplyne send --expr 'sales'
+uv run pyplyne serve --port 8765 --load setup.pyplyne
+
+uv run pyplyne send --json <<'PYPLYNE'
+summary = df sales
+  |> group_by(region)
+  |> summarize(total = sum(amount))
+
+summary
+PYPLYNE
 ```
 
-This gives agents and editor integrations a simple loop:
+The JSON response gives an agent enough structure to decide what to do next:
+`ok`, `result`, `diagnostic`, `phase`, `traceback`, and current `shapes`.
+If the source came from an editor buffer or generated agent step, add
+`--source-name agent-step-01.pyplyne` to label diagnostics with that virtual
+source name.
+
+This makes agent and editor integrations a simple loop:
 
 1. Start or connect to a session.
 2. Load imports, helpers, and data once with `--load` or an initial snippet.
 3. Send complete, focused PyPlyne snippets.
 4. Request `--json` and inspect `ok`, `result`, `diagnostic`, and `shapes`.
-5. Use `--filename` so parse, compile, and runtime messages point back to the
-   agent step or editor buffer.
+5. Optionally add `--source-name` when errors should point back to an agent
+   step, notebook cell, or editor buffer.
 6. Refine the pipeline without rebuilding the whole environment.
 
 Prefer complete snippets over fragments that depend on client-side context. The
 session persists names and shapes, but each request still compiles as its own
 PyPlyne source unit.
+
+<a id="remote-or-agent-workflows"></a>
+
+Remote sessions use the same loop. The server binds to a host and port, so you
+can connect through SSH forwarding when data lives on another machine:
+
+```bash
+ssh -L 8765:127.0.0.1:8765 user@remote
+PYPLYNE_URL=http://127.0.0.1:8765 uv run pyplyne send --expr 'sales'
+```
 
 ## Last Result
 

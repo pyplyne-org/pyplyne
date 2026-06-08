@@ -6,12 +6,13 @@
 }
 
 .heroInner {
+  align-content: start;
   box-sizing: border-box;
   display: grid;
-  gap: 1.3rem;
+  gap: 1rem;
   margin: 0 auto;
   max-width: 1180px;
-  min-height: calc(100dvh - var(--ifm-navbar-height) - 1.5rem);
+  min-height: min(38rem, calc(100dvh - var(--ifm-navbar-height) - 1.5rem));
   padding: 1.7rem 1.5rem 1.6rem;
 }
 
@@ -24,7 +25,7 @@
 
 .brandLockup {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.56rem;
   min-width: 0;
 }
 
@@ -61,16 +62,102 @@
   margin-top: 0;
 }
 
+.heroButton {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-shadow: 0 0.55rem 1.2rem rgba(16, 34, 48, 0.1);
+  box-sizing: border-box;
+  color: inherit;
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 760;
+  gap: 0.6rem;
+  justify-content: center;
+  line-height: 1;
+  min-height: 2.75rem;
+  min-width: 9.5rem;
+  padding: 0.82rem 1.02rem;
+  text-decoration: none;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.heroButton::after {
+  border-right: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  content: '';
+  flex: 0 0 auto;
+  height: 0.46rem;
+  margin-left: 0.05rem;
+  transform: rotate(45deg);
+  transition: transform 140ms ease;
+  width: 0.46rem;
+}
+
+.heroButton:hover {
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.heroButton:hover::after {
+  transform: translateX(2px) rotate(45deg);
+}
+
+.heroButton:focus-visible {
+  box-shadow: 0 0 0 3px #f7fbff, 0 0 0 6px #276749;
+  outline: none;
+}
+
+.primaryHeroButton {
+  background: #276749;
+  border-color: #276749;
+  color: #ffffff;
+}
+
+.primaryHeroButton:hover,
+.primaryHeroButton:focus-visible {
+  background: #21583f;
+  border-color: #21583f;
+  color: #ffffff;
+}
+
+.secondaryHeroButton {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(39, 103, 73, 0.24);
+  color: #173f35;
+}
+
+.secondaryHeroButton:hover,
+.secondaryHeroButton:focus-visible {
+  background: #ffffff;
+  border-color: #276749;
+  color: #102230;
+}
+
 .installPanel {
   align-items: center;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(22, 38, 52, 0.14);
-  border-radius: 8px;
-  box-shadow: 0 0.9rem 2.2rem rgba(16, 34, 48, 0.08);
   display: grid;
-  gap: 1rem;
-  grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1fr);
-  padding: 0.86rem 1rem;
+  gap: 0.85rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.46fr);
+  padding: 0;
+}
+
+.installSetup {
+  align-items: center;
+  background: rgba(39, 103, 73, 0.045);
+  border: 1px solid rgba(39, 103, 73, 0.16);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.62rem;
+  grid-template-columns: minmax(18rem, 0.88fr) minmax(13rem, 1fr);
+  min-width: 0;
+  padding: 0.5rem;
 }
 
 .installCommand {
@@ -103,7 +190,6 @@
 
 .installCopy {
   display: grid;
-  gap: 0.5rem;
   min-width: 0;
 }
 
@@ -117,18 +203,38 @@
 .installLinks {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem 0.8rem;
+  gap: 0.45rem;
+  min-width: 0;
 }
 
 .installLinks a {
   align-items: center;
-  color: #1f6f50;
+  background: rgba(39, 103, 73, 0.08);
+  border: 1px solid rgba(39, 103, 73, 0.14);
+  border-radius: 8px;
+  color: #173f35;
   display: inline-flex;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  gap: 0.32rem;
+  gap: 0.36rem;
   line-height: 1.2;
-  min-height: 1.35rem;
+  min-height: 2rem;
+  padding: 0.42rem 0.58rem;
+  text-decoration: none;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.installLinks a:hover,
+.installLinks a:focus-visible {
+  background: rgba(39, 103, 73, 0.14);
+  border-color: rgba(39, 103, 73, 0.36);
+  color: #102230;
+  text-decoration: none;
+}
+
+.installLinks a:focus-visible {
+  outline: 2px solid #276749;
+  outline-offset: 2px;
 }
 
 .installLinks img {
@@ -139,6 +245,7 @@
 }
 
 .previewStack {
+  align-items: start;
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -163,8 +270,7 @@
   box-sizing: border-box;
   color: #edf6f9;
   display: grid;
-  grid-template-rows: 2rem minmax(5.85rem, max-content) minmax(2.15rem, max-content) 1fr;
-  min-height: 20.9rem;
+  grid-template-rows: 2rem auto auto auto;
   min-width: 0;
   overflow: hidden;
   width: 100%;
@@ -197,8 +303,7 @@
 }
 
 .demoCode code {
-  display: grid;
-  gap: 0.12rem;
+  display: block;
 }
 
 .preview :global(.token.keyword),
@@ -246,6 +351,7 @@
 
 .codeLine {
   border-radius: 4px;
+  display: block;
   min-height: 0.96rem;
   min-width: 0;
   opacity: 1;
@@ -274,6 +380,7 @@
 }
 
 .dataFlow {
+  align-items: start;
   display: grid;
   gap: 0.6rem;
   grid-template-columns: 1fr 1fr;
@@ -389,7 +496,7 @@
 .benefitBand {
   margin: 0 auto;
   max-width: 1120px;
-  padding: 3.25rem 1.5rem;
+  padding: 2.35rem 1.5rem;
 }
 
 .featureGrid {
@@ -438,7 +545,7 @@
 
 .benefitBand {
   border-top: 1px solid #e2e8f0;
-  padding-top: 3rem;
+  padding-top: 2.1rem;
 }
 
 .sectionIntro {
@@ -587,9 +694,13 @@
 }
 
 :global(html[data-theme='dark']) .featureCard,
-:global(html[data-theme='dark']) .benefitSection,
-:global(html[data-theme='dark']) .installPanel {
+:global(html[data-theme='dark']) .benefitSection {
   background: #101b24;
+  border-color: #26384a;
+}
+
+:global(html[data-theme='dark']) .installSetup {
+  background: rgba(7, 20, 27, 0.42);
   border-color: #26384a;
 }
 
@@ -601,12 +712,55 @@
   color: #8ee0b5;
 }
 
+:global(html[data-theme='dark']) .heroButton:focus-visible {
+  box-shadow: 0 0 0 3px #07141b, 0 0 0 6px #8ee0b5;
+}
+
+:global(html[data-theme='dark']) .primaryHeroButton {
+  background: #8ee0b5;
+  border-color: #8ee0b5;
+  color: #07141b;
+}
+
+:global(html[data-theme='dark']) .primaryHeroButton:hover,
+:global(html[data-theme='dark']) .primaryHeroButton:focus-visible {
+  background: #b3f1ce;
+  border-color: #b3f1ce;
+  color: #07141b;
+}
+
+:global(html[data-theme='dark']) .secondaryHeroButton {
+  background: rgba(205, 231, 220, 0.08);
+  border-color: rgba(142, 224, 181, 0.3);
+  color: #dce7ed;
+}
+
+:global(html[data-theme='dark']) .secondaryHeroButton:hover,
+:global(html[data-theme='dark']) .secondaryHeroButton:focus-visible {
+  background: rgba(205, 231, 220, 0.14);
+  border-color: #8ee0b5;
+  color: #ffffff;
+}
+
 :global(html[data-theme='dark']) .installCopy p {
   color: #c8d3dc;
 }
 
 :global(html[data-theme='dark']) .installLinks a {
-  color: #8ee0b5;
+  background: rgba(142, 224, 181, 0.09);
+  border-color: rgba(142, 224, 181, 0.18);
+  color: #dce7ed;
+}
+
+:global(html[data-theme='dark']) .installLinks a:hover,
+:global(html[data-theme='dark']) .installLinks a:focus-visible {
+  background: rgba(142, 224, 181, 0.15);
+  border-color: rgba(142, 224, 181, 0.42);
+  color: #ffffff;
+}
+
+:global(html[data-theme='dark']) .installLinks a:focus-visible {
+  outline-color: #8ee0b5;
 }
 
 :global(html[data-theme='dark']) .preview {
@@ -687,14 +841,22 @@
     gap: 0.55rem;
   }
 
+  .heroButton {
+    min-height: 2.55rem;
+    padding: 0.74rem 0.9rem;
+  }
+
   .installPanel {
-    padding: 0.72rem 0.82rem;
+    gap: 0.55rem;
+  }
+
+  .installSetup {
+    padding: 0.42rem;
   }
 
   .preview {
     box-shadow: 0 1rem 2.6rem rgba(16, 34, 48, 0.18);
-    grid-template-rows: 1.85rem minmax(5.45rem, max-content) minmax(2rem, max-content) 1fr;
-    min-height: 19.6rem;
+    grid-template-rows: 1.85rem auto auto auto;
   }
 
   .preview pre {
@@ -722,6 +884,10 @@
   }
 
   .installPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .installSetup {
     grid-template-columns: 1fr;
   }
 }
@@ -808,6 +974,15 @@
     padding-top: 2rem;
   }
 
+  .featureBand,
+  .benefitBand {
+    padding: 3.25rem 1.5rem;
+  }
+
+  .benefitBand {
+    padding-top: 3rem;
+  }
+
   .featureGrid {
     grid-template-columns: 1fr;
   }
@@ -838,6 +1013,12 @@
   .actions {
     justify-content: flex-start;
     margin-top: 1rem;
+    width: 100%;
+  }
+
+  .heroButton {
+    flex: 1 1 11rem;
+    min-width: 0;
   }
 
   .installPanel {
@@ -857,8 +1038,7 @@
   }
 
   .preview {
-    grid-template-rows: 2rem auto auto 1fr;
-    min-height: 21.4rem;
+    grid-template-rows: 2rem auto auto auto;
   }
 
   .dataFlow {

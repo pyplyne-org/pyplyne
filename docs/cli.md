@@ -145,8 +145,11 @@ can. Text output shows the readable diagnostic. JSON output includes a
 `error_type`, `message`, `filename`, `line`, `column`, `source`, `caret`,
 `hint`, and `display`.
 
-Use `--filename` with piped or expression source when you want diagnostics to
-refer to a virtual file name instead of a generic session label.
+If you do not pass a source name, PyPlyne uses a generated session label in
+diagnostics. Optionally use `--source-name` with piped, generated, or expression
+source when you want diagnostics to refer to a stable virtual source name
+instead. This names the submitted snippet for diagnostics; it does not read a
+file. `--filename` is accepted as a compatibility alias.
 
 In session examples, `_` may mean either the last expression result or the
 current item inside a sequence callback. See [Last Result](interactive-sessions.md#last-result)

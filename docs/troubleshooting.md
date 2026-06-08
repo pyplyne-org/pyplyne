@@ -45,12 +45,12 @@ Good debugging loop:
 4. Use `shapes` to confirm whether each name is `seq`, `df`, or scalar.
 5. Fix one contract at a time and rerun the smallest expression.
 
-For piped or generated source, pass a stable virtual filename so diagnostics
-point to something recognizable:
+For piped or generated source, you can pass a stable virtual source name so
+diagnostics point to something recognizable:
 
 ```bash
 printf 'numbers = seq [1, 2, 3\n' \
-  | uv run pyplyne send --json --filename scratch.pyplyne
+  | uv run pyplyne send --json --source-name scratch.pyplyne
 ```
 
 ## Parse Errors
@@ -260,7 +260,7 @@ Fix patterns for session confusion:
 - **A previous failed run left later code confusing:** check `shapes`; parse and
   compile failures do not execute the snippet, but runtime failures can leave
   earlier successful statements from the same snippet in `env`.
-- **Diagnostics refer to a generic session label:** use `--filename` for piped
+- **Diagnostics refer to a generic session label:** use `--source-name` for piped
   or expression source.
 - **Text output hides the full stack trace:** use `--json` or
   `run(..., raise_on_error=False)` and inspect `traceback`.

@@ -55,13 +55,13 @@ function walkMarkdownFiles(directory) {
 }
 
 function frontmatterFor(text) {
-  const match = text.match(/^---\n([\s\S]*?)\n---\n/);
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) {
     return {};
   }
   return Object.fromEntries(
     match[1]
-      .split('\n')
+      .split(/\r?\n/)
       .map((line) => line.match(/^([^:]+):\s*(.*)$/))
       .filter(Boolean)
       .map((match) => [match[1].trim(), match[2].trim().replace(/^["']|["']$/g, '')]),
@@ -253,6 +253,33 @@ summary = result.result
 last expression result \`_\` alive. Use \`session.get(name)\`,
 \`session.get_df(name)\`, and \`session.get_seq(name)\` to retrieve live Python
 objects.
+
+## Agent Session Loop
+
+For agents iterating against loaded data, prefer a warm session server plus
+\`pyplyne send --json\`. Start the server once, usually with setup preloaded:
+
+\`\`\`bash
+uv run pyplyne serve --port 8765 --load setup.pyplyne
+\`\`\`
+
+For multiline snippets, send source through stdin with a heredoc rather than
+packing it into \`--expr\`:
+
+\`\`\`bash
+uv run pyplyne send --json <<'PYPLYNE'
+summary = df sales
+  |> group_by(region)
+  |> summarize(total = sum(amount))
+
+summary
+PYPLYNE
+\`\`\`
+
+\`--source-name\` is optional metadata for diagnostics, not a file input. Add it
+only when generated or editor-buffer source needs a stable label, such as
+\`--source-name agent-step-01.pyplyne\`. Otherwise PyPlyne uses a generated
+session label.
 
 ## Error Guidance
 

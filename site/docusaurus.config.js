@@ -39,6 +39,10 @@ const config = {
   themeConfig: {
     navbar: {
       title: 'PyPlyne',
+      logo: {
+        alt: 'PyPlyne logo',
+        src: 'img/pyplyne-icon.svg',
+      },
       items: [
         {to: '/docs/', label: 'Docs', position: 'left'},
         {to: '/docs/quickstart', label: 'Quickstart', position: 'left'},

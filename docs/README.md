@@ -5,8 +5,6 @@ sidebar_position: 1
 description: Learn PyPlyne, a Python-native way to write clean functional pipes for Polars tables and JSON-like records.
 ---
 
-# PyPlyne Documentation
-
 PyPlyne brings clean functional pipes directly to Python. It gives data
 transformations a left-to-right shape while staying inside the Python runtime,
 with Polars-first table workflows and compact sequence workflows for JSON-like

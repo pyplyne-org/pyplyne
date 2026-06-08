@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="site/static/img/pyplyne-icon.svg" alt="PyPlyne logo" width="96" height="96">
+</p>
+
 # PyPlyne
 
 PyPlyne brings clean functional pipes directly to Python, so data transformations

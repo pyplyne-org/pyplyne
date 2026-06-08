@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">PyPlyne pipe token mint concept</title>
+  <desc id="desc">A dark ink tile with a two-tone mint pipeline mark.</desc>
+  <rect width="64" height="64" rx="14" fill="#102230"/>
+  <path d="M22 17v30" fill="none" stroke="#b3f1ce" stroke-width="8" stroke-linecap="round"/>
+  <path d="M34 22l11 10-11 10" fill="none" stroke="#76d19b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17 50h30" fill="none" stroke="#e6fff1" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+</svg>
