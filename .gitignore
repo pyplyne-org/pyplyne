@@ -4,6 +4,8 @@
 .coverage
 .coverage.*
 coverage.xml
+coverage-summary.md
+coverage-comment.md
 htmlcov/
 __pycache__/
 *.py[cod]
