@@ -70,6 +70,39 @@ SCALAR_KIND = "scalar"
 SHAPE_KINDS = {DF_KIND, SEQ_KIND}
 
 
+def _literal_string_value(source: str) -> str:
+    try:
+        return ast.literal_eval(source)
+    except SyntaxError:
+        pass
+
+    quote = source[0]
+    inner = source[1:-1]
+    value = []
+    index = 0
+    while index < len(inner):
+        char = inner[index]
+        if char != "\\" or index == len(inner) - 1:
+            value.append(char)
+            index += 1
+            continue
+
+        escaped = inner[index + 1]
+        if escaped in {quote, "\\"}:
+            value.append(escaped)
+            index += 2
+            continue
+
+        if escaped == "\n":
+            index += 2
+            continue
+
+        value.append("\\" + escaped)
+        index += 2
+
+    return "".join(value)
+
+
 def compile_ast(
     tree: Tree,
     filename: str = "<pyplyne>",
@@ -214,7 +247,7 @@ class AstBuilder:
         if item.data == "identifier":
             return self._loc(ast.Name(id=str(self._token(item.children[0])), ctx=ast.Load()), item)
         if item.data == "string":
-            return self._loc(ast.Constant(value=ast.literal_eval(str(item.children[0]))), item)
+            return self._loc(ast.Constant(value=_literal_string_value(str(item.children[0]))), item)
         if item.data == "number":
             return self._loc(ast.Constant(value=ast.literal_eval(str(item.children[0]))), item)
         if item.data == "true":

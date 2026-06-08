@@ -9,6 +9,30 @@ from pyplyne.cli import run_file, run_source
 from pyplyne.transformer import compile_ast, iter_nodes
 
 
+def test_string_literals_preserve_windows_paths():
+    env = run_source(
+        r'''
+path = "C:\Users\example\AppData\Local\sales.csv"
+tab_like_path = "C:\Users\example\test\sales.csv"
+''',
+        filename="windows_path_string_test.pyplyne",
+    )
+
+    assert env["path"] == r"C:\Users\example\AppData\Local\sales.csv"
+    assert env["tab_like_path"] == r"C:\Users\example\test\sales.csv"
+
+
+def test_string_literals_keep_python_style_escapes():
+    env = run_source(
+        r'''
+message = "north\nsouth"
+''',
+        filename="string_escape_test.pyplyne",
+    )
+
+    assert env["message"] == "north\nsouth"
+
+
 def test_list_pipeline_runs():
     env = run_source(
         """
