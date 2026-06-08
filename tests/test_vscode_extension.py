@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-
 EXTENSION_ROOT = Path(__file__).resolve().parents[1] / "editors" / "vscode-pyplyne"
 
 
@@ -44,14 +43,25 @@ def test_vscode_extension_contributes_interactive_commands():
     }.issubset(commands)
     assert "onLanguage:pyplyne" in manifest["activationEvents"]
 
-    keybindings = {binding["command"]: binding for binding in manifest["contributes"]["keybindings"]}
+    keybindings = {
+        binding["command"]: binding
+        for binding in manifest["contributes"]["keybindings"]
+    }
     assert keybindings["pyplyne.runCurrentLine"]["mac"] == "cmd+enter"
     assert keybindings["pyplyne.runCurrentBlock"]["mac"] == "cmd+shift+enter"
-    assert keybindings["pyplyne.runCurrentAssignmentAndShowResult"]["mac"] == "cmd+alt+shift+enter"
+    assert (
+        keybindings["pyplyne.runCurrentAssignmentAndShowResult"]["mac"]
+        == "cmd+alt+shift+enter"
+    )
     assert keybindings["pyplyne.goToNextBlock"]["mac"] == "cmd+shift+down"
     assert keybindings["pyplyne.goToPreviousBlock"]["mac"] == "cmd+shift+up"
-    assert keybindings["pyplyne.goToNextBlock"]["when"] == "editorTextFocus && editorLangId == pyplyne"
-    palette_commands = {item["command"] for item in manifest["contributes"]["menus"]["commandPalette"]}
+    assert (
+        keybindings["pyplyne.goToNextBlock"]["when"]
+        == "editorTextFocus && editorLangId == pyplyne"
+    )
+    palette_commands = {
+        item["command"] for item in manifest["contributes"]["menus"]["commandPalette"]
+    }
     assert "pyplyne.goToNextBlock" in palette_commands
     assert "pyplyne.goToPreviousBlock" in palette_commands
 
@@ -62,7 +72,7 @@ def test_vscode_extension_surfaces_process_launch_errors():
     assert 'this.process.once("error"' in extension
     assert "Could not launch" in extension
     assert "Spawn PATH" in extension
-    assert "runCommand(\"start session\"" in extension
+    assert 'runCommand("start session"' in extension
     assert "vscode.window.showErrorMessage" in extension
 
 

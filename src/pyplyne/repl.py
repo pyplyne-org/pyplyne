@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from pyplyne.diagnostics import build_diagnostic
 from pyplyne.session import PyPlyneSession
-
 
 PROMPT = "pyplyne> "
 MORE_PROMPT = "...   "
 
 
-def run_repl(session: Optional[PyPlyneSession] = None) -> int:
+def run_repl(session: PyPlyneSession | None = None) -> int:
     session = session or PyPlyneSession()
     buffer: list[str] = []
-    print("PyPlyne interactive session. End assignment blocks with a blank line. Use :paste for multi-line paste.")
+    print(
+        "PyPlyne interactive session. End assignment blocks with a blank line. Use :paste for multi-line paste."
+    )
 
     while True:
         try:
@@ -99,7 +98,9 @@ def _looks_complete(lines: list[str]) -> bool:
         return False
     if len(lines) == 1 and "=" in last and "|>" not in last:
         return False
-    if len(lines) > 1 and (lines[-1].startswith((" ", "\t")) or lines[-2].rstrip().endswith("|>")):
+    if len(lines) > 1 and (
+        lines[-1].startswith((" ", "\t")) or lines[-2].rstrip().endswith("|>")
+    ):
         return False
     return True
 
@@ -108,7 +109,7 @@ def _bracket_depth(source: str) -> int:
     pairs = {"(": ")", "[": "]", "{": "}"}
     closers = {")", "]", "}"}
     stack = []
-    in_string: Optional[str] = None
+    in_string: str | None = None
     escaped = False
     for char in source:
         if in_string:

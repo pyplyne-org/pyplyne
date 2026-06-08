@@ -25,7 +25,7 @@ Update the package source first, then regenerate with `npm run docs:api` from
 ```python
 run(
     source: 'str',
-    context: 'Optional[dict[str, Any]]' = None,
+    context: 'dict[str, Any] | None' = None,
     filename: 'str' = '<pyplyne>',
     *,
     capture_output: 'bool' = True,
@@ -58,7 +58,7 @@ Run PyPlyne source once without managing a persistent session.
 ```python
 run_file(
     path: 'str | Path',
-    context: 'Optional[dict[str, Any]]' = None,
+    context: 'dict[str, Any] | None' = None,
     *,
     capture_output: 'bool' = True,
     raise_on_error: 'bool' = True,
@@ -87,7 +87,7 @@ Run a `.pyplyne` file once without managing a persistent session.
 ## `PyPlyneSession`
 
 ```python
-PyPlyneSession(globals_dict: 'Optional[dict[str, Any]]' = None) -> 'None'
+PyPlyneSession(globals_dict: 'dict[str, Any] | None' = None) -> 'None'
 ```
 
 Persistent PyPlyne execution environment.
@@ -107,7 +107,7 @@ shapes, and the most recent expression result across runs.
 run(
     self,
     source: 'str',
-    filename: 'Optional[str]' = None,
+    filename: 'str | None' = None,
     *,
     capture_output: 'bool' = True,
     raise_on_error: 'bool' = True,
@@ -252,10 +252,10 @@ PyPlyneExecutionResult(
     stdout: 'str',
     stderr: 'str',
     result: 'Any' = None,
-    error: 'Optional[BaseException]' = None,
-    phase: 'Optional[str]' = None,
+    error: 'BaseException | None' = None,
+    phase: 'str | None' = None,
     traceback: 'str' = '',
-    shapes: 'Optional[dict[str, str]]' = None,
+    shapes: 'dict[str, str] | None' = None,
 ) -> None
 ```
 
@@ -272,10 +272,10 @@ Result object returned by `PyPlyneSession.run`.
 | `stdout` | `str` | `required` | Text written to standard output while the source ran. |
 | `stderr` | `str` | `required` | Text written to standard error while the source ran. |
 | `result` | `Any` | `None` | Final expression value when `store_result` is true and the snippet ends with an expression. |
-| `error` | `Optional[BaseException]` | `None` | Exception captured from parsing, compiling, or running the source. |
-| `phase` | `Optional[str]` | `None` | Failure phase, usually `parse`, `compile`, or `runtime`. |
+| `error` | `BaseException | None` | `None` | Exception captured from parsing, compiling, or running the source. |
+| `phase` | `str | None` | `None` | Failure phase, usually `parse`, `compile`, or `runtime`. |
 | `traceback` | `str` | `''` | Python traceback text for captured errors. |
-| `shapes` | `Optional[dict[str, str]]` | `None` | Known `df` and `seq` variable shapes after the run. |
+| `shapes` | `dict[str, str] | None` | `None` | Known `df` and `seq` variable shapes after the run. |
 
 ### Properties
 
@@ -316,7 +316,7 @@ Parse PyPlyne source text into a Lark parse tree.
 compile_ast(
     tree: 'Tree',
     filename: 'str' = '<pyplyne>',
-    symbol_kinds: 'Optional[dict[str, str]]' = None,
+    symbol_kinds: 'dict[str, str] | None' = None,
 ) -> 'ast.Module'
 ```
 

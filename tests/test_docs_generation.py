@@ -1,17 +1,19 @@
 import importlib.util
 from pathlib import Path
 
-import pyplyne
 import pytest
-from pyplyne import PyPlyneSession
 
+import pyplyne
+from pyplyne import PyPlyneSession
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 GENERATOR_PATH = PROJECT_ROOT / "site" / "scripts" / "generate_python_api_reference.py"
 
 
 def _load_generator_module():
-    spec = importlib.util.spec_from_file_location("generate_python_api_reference", GENERATOR_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "generate_python_api_reference", GENERATOR_PATH
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)

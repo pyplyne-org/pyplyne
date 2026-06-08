@@ -1,13 +1,11 @@
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from pathlib import Path
-import re
-from typing import Optional, Union
 
 from lark import Lark, Tree
 from lark.exceptions import UnexpectedEOF, UnexpectedInput
-
 
 GRAMMAR_PATH = Path(__file__).with_name("grammar.lark")
 LEGACY_SHAPE_DECL_PATTERN = re.compile(
@@ -56,7 +54,7 @@ def parse_source(source: str, filename: str = "<pyplyne>") -> Tree:
         raise PyPlyneParseError(_format_parse_error(source, filename, exc)) from None
 
 
-def parse_file(path: Union[str, Path]) -> Tree:
+def parse_file(path: str | Path) -> Tree:
     """Parse a `.pyplyne` file from disk."""
 
     file_path = Path(path)
@@ -70,7 +68,11 @@ def _reject_legacy_shape_declarations(source: str, filename: str) -> None:
 
     line = source.count("\n", 0, match.start("kind")) + 1
     last_newline = source.rfind("\n", 0, match.start("kind"))
-    column = match.start("kind") + 1 if last_newline == -1 else match.start("kind") - last_newline
+    column = (
+        match.start("kind") + 1
+        if last_newline == -1
+        else match.start("kind") - last_newline
+    )
     found = match.group("kind")
     expected = found.lower()
     name = match.group("name")
@@ -116,7 +118,7 @@ def _error_location(source: str, exc: UnexpectedInput) -> tuple[int, int]:
     return len(lines), len(lines[-1]) + 1
 
 
-def _expected_tokens(expected: Optional[set[str]]) -> list[str]:
+def _expected_tokens(expected: set[str] | None) -> list[str]:
     if not expected:
         return []
     names = {_friendly_token_name(name) for name in expected}

@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Optional
 from urllib.error import HTTPError
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 from urllib.request import Request, urlopen
-
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
@@ -27,14 +25,16 @@ class PyPlyneClientResponse:
 def send_source(
     source: str,
     *,
-    url: Optional[str] = None,
+    url: str | None = None,
     host: str = DEFAULT_HOST,
     port: int = DEFAULT_PORT,
     json_output: bool = False,
-    filename: Optional[str] = None,
+    filename: str | None = None,
     timeout: float = 30,
 ) -> PyPlyneClientResponse:
-    endpoint = run_endpoint(url=url, host=host, port=port, json_output=json_output, filename=filename)
+    endpoint = run_endpoint(
+        url=url, host=host, port=port, json_output=json_output, filename=filename
+    )
     request = Request(
         endpoint,
         data=source.encode("utf-8"),
@@ -56,11 +56,11 @@ def send_source(
 
 def run_endpoint(
     *,
-    url: Optional[str] = None,
+    url: str | None = None,
     host: str = DEFAULT_HOST,
     port: int = DEFAULT_PORT,
     json_output: bool = False,
-    filename: Optional[str] = None,
+    filename: str | None = None,
 ) -> str:
     base = url or os.environ.get(PYPLYNE_URL_ENV) or f"http://{host}:{port}"
     if "://" not in base:

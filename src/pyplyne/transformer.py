@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import ast
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Optional, Union
 
 from lark import Token, Tree
 
@@ -10,7 +10,7 @@ from lark import Token, Tree
 @dataclass(frozen=True)
 class ImportAlias:
     name: str
-    asname: Optional[str]
+    asname: str | None
 
 
 @dataclass(frozen=True)
@@ -106,7 +106,7 @@ def _literal_string_value(source: str) -> str:
 def compile_ast(
     tree: Tree,
     filename: str = "<pyplyne>",
-    symbol_kinds: Optional[dict[str, str]] = None,
+    symbol_kinds: dict[str, str] | None = None,
 ) -> ast.Module:
     """Compile a PyPlyne parse tree into a Python AST module.
 
@@ -129,7 +129,9 @@ def compile_ast(
 
 
 class AstBuilder:
-    def __init__(self, filename: str, symbol_kinds: Optional[dict[str, str]] = None) -> None:
+    def __init__(
+        self, filename: str, symbol_kinds: dict[str, str] | None = None
+    ) -> None:
         self.filename = filename
         self.symbol_kinds = symbol_kinds if symbol_kinds is not None else {}
 
@@ -146,9 +148,13 @@ class AstBuilder:
                 body.append(built)
         return ast.Module(body=body, type_ignores=[])
 
-    def _stmt(self, tree: Tree) -> Optional[ast.stmt]:
+    def _stmt(self, tree: Tree) -> ast.stmt | None:
         if tree.data == "statement":
-            inner = [child for child in tree.children if isinstance(child, Tree) and child.data != "statement_end"]
+            inner = [
+                child
+                for child in tree.children
+                if isinstance(child, Tree) and child.data != "statement_end"
+            ]
             if not inner:
                 return None
             return self._stmt(inner[0])
@@ -156,7 +162,9 @@ class AstBuilder:
         if tree.data == "import_stmt":
             aliases = [self._import_alias(child) for child in tree.children]
             node = ast.Import(
-                names=[ast.alias(name=alias.name, asname=alias.asname) for alias in aliases]
+                names=[
+                    ast.alias(name=alias.name, asname=alias.asname) for alias in aliases
+                ]
             )
             return self._loc(node, tree)
         if tree.data == "from_import_stmt":
@@ -164,7 +172,9 @@ class AstBuilder:
             aliases = [self._import_alias(child) for child in tree.children[1:]]
             node = ast.ImportFrom(
                 module=module,
-                names=[ast.alias(name=alias.name, asname=alias.asname) for alias in aliases],
+                names=[
+                    ast.alias(name=alias.name, asname=alias.asname) for alias in aliases
+                ],
                 level=0,
             )
             return self._loc(node, tree)
@@ -191,12 +201,14 @@ class AstBuilder:
         node = ast.Expr(value=value)
         return self._loc(node, tree)
 
-    def _expr(self, item: Union[Tree, Token, ast.expr]) -> ast.expr:
+    def _expr(self, item: Tree | Token | ast.expr) -> ast.expr:
         if isinstance(item, ast.expr):
             return item
         if isinstance(item, Token):
             if item.type == "NAME":
-                return self._loc_from_token(ast.Name(id=str(item), ctx=ast.Load()), item)
+                return self._loc_from_token(
+                    ast.Name(id=str(item), ctx=ast.Load()), item
+                )
             self._fail(item, f"unexpected token {item.type}")
 
         if item.data == "shape_expr":
@@ -223,7 +235,9 @@ class AstBuilder:
                 comparators.append(self._expr(right))
             if not ops:
                 return left
-            return self._loc(ast.Compare(left=left, ops=ops, comparators=comparators), item)
+            return self._loc(
+                ast.Compare(left=left, ops=ops, comparators=comparators), item
+            )
         if item.data in ("arith", "term"):
             return self._bin_ops(item)
         if item.data == "unary_expr":
@@ -245,11 +259,17 @@ class AstBuilder:
                 current = self._apply_trailer(current, self._trailer(trailer))
             return current
         if item.data == "identifier":
-            return self._loc(ast.Name(id=str(self._token(item.children[0])), ctx=ast.Load()), item)
+            return self._loc(
+                ast.Name(id=str(self._token(item.children[0])), ctx=ast.Load()), item
+            )
         if item.data == "string":
-            return self._loc(ast.Constant(value=_literal_string_value(str(item.children[0]))), item)
+            return self._loc(
+                ast.Constant(value=_literal_string_value(str(item.children[0]))), item
+            )
         if item.data == "number":
-            return self._loc(ast.Constant(value=ast.literal_eval(str(item.children[0]))), item)
+            return self._loc(
+                ast.Constant(value=ast.literal_eval(str(item.children[0]))), item
+            )
         if item.data == "true":
             return self._loc(ast.Constant(value=True), item)
         if item.data == "false":
@@ -289,11 +309,13 @@ class AstBuilder:
     def _pipe(
         self,
         value: ast.expr,
-        current_kind: Optional[str],
-        target: Union[Tree, Token],
-    ) -> tuple[ast.expr, Optional[str]]:
+        current_kind: str | None,
+        target: Tree | Token,
+    ) -> tuple[ast.expr, str | None]:
         if isinstance(target, Token):
-            func = self._loc_from_token(ast.Name(id=str(target), ctx=ast.Load()), target)
+            func = self._loc_from_token(
+                ast.Name(id=str(target), ctx=ast.Load()), target
+            )
             next_kind = self._validate_verb_kind(current_kind, str(target), target)
             node = ast.Call(func=func, args=[value], keywords=[])
             return self._loc_from_token(node, target), next_kind
@@ -314,7 +336,10 @@ class AstBuilder:
 
         call = self._expr(target)
         if not isinstance(call, ast.Call):
-            self._fail(target, "pipeline target must be a function call, method call, or identifier")
+            self._fail(
+                target,
+                "pipeline target must be a function call, method call, or identifier",
+            )
         next_kind = self._validate_call_kind(current_kind, call, target)
         self._rewrite_pipe_call(call)
         call.args.insert(0, value)
@@ -324,11 +349,17 @@ class AstBuilder:
         text = str(token)
         if text in SHAPE_KINDS:
             return text
-        raise SyntaxError(f"{self.filename}:{token.line}:{token.column}: expected df or seq")
+        raise SyntaxError(
+            f"{self.filename}:{token.line}:{token.column}: expected df or seq"
+        )
 
-    def _pipeline_expr(self, item: Tree, initial_kind: Optional[str] = None) -> ast.expr:
+    def _pipeline_expr(self, item: Tree, initial_kind: str | None = None) -> ast.expr:
         current = self._expr(item.children[0])
-        current_kind = initial_kind if initial_kind is not None else self._expr_kind(self._tree(item.children[0]))
+        current_kind = (
+            initial_kind
+            if initial_kind is not None
+            else self._expr_kind(self._tree(item.children[0]))
+        )
         if initial_kind is not None:
             current = self._coerce_declared_value(current, initial_kind)
         for target in item.children[1:]:
@@ -340,7 +371,7 @@ class AstBuilder:
             return self._pipeline_expr(value_tree, initial_kind=shape_kind)
         return self._coerce_declared_value(self._expr(value_tree), shape_kind)
 
-    def _expr_kind(self, item: Union[Tree, Token]) -> Optional[str]:
+    def _expr_kind(self, item: Tree | Token) -> str | None:
         if isinstance(item, Token):
             return self.symbol_kinds.get(str(item)) if item.type == "NAME" else None
         if item.data == "shape_expr":
@@ -359,24 +390,34 @@ class AstBuilder:
             return self._primary_kind(item)
         return None
 
-    def _pipeline_kind(self, item: Tree, initial_kind: Optional[str] = None) -> Optional[str]:
-        current_kind = initial_kind if initial_kind is not None else self._expr_kind(self._tree(item.children[0]))
+    def _pipeline_kind(self, item: Tree, initial_kind: str | None = None) -> str | None:
+        current_kind = (
+            initial_kind
+            if initial_kind is not None
+            else self._expr_kind(self._tree(item.children[0]))
+        )
         for target in item.children[1:]:
             current_kind = self._target_kind(current_kind, target)
         return current_kind
 
-    def _primary_kind(self, tree: Tree) -> Optional[str]:
+    def _primary_kind(self, tree: Tree) -> str | None:
         if not tree.children:
             return None
         base = tree.children[0]
         if isinstance(base, Tree) and base.data == "identifier":
             base_name = str(self._token(base.children[0]))
             if len(tree.children) > 1:
-                if base_name in TABLE_READ_FUNCTIONS and self._is_call_trailer(self._tree(tree.children[1])):
+                if base_name in TABLE_READ_FUNCTIONS and self._is_call_trailer(
+                    self._tree(tree.children[1])
+                ):
                     return DF_KIND
-                if base_name == "to_table" and self._is_call_trailer(self._tree(tree.children[1])):
+                if base_name == "to_table" and self._is_call_trailer(
+                    self._tree(tree.children[1])
+                ):
                     return DF_KIND
-                if base_name == "to_rows" and self._is_call_trailer(self._tree(tree.children[1])):
+                if base_name == "to_rows" and self._is_call_trailer(
+                    self._tree(tree.children[1])
+                ):
                     return SEQ_KIND
             return self.symbol_kinds.get(base_name)
         return None
@@ -384,34 +425,41 @@ class AstBuilder:
     def _is_call_trailer(self, tree: Tree) -> bool:
         return tree.data == "call_trailer"
 
-    def _target_kind(self, current_kind: Optional[str], target: Union[Tree, Token]) -> Optional[str]:
+    def _target_kind(
+        self, current_kind: str | None, target: Tree | Token
+    ) -> str | None:
         if isinstance(target, Token):
             return self._validate_verb_kind(current_kind, str(target), target)
         if target.data == "identifier":
-            return self._validate_verb_kind(current_kind, str(self._token(target.children[0])), target)
+            return self._validate_verb_kind(
+                current_kind, str(self._token(target.children[0])), target
+            )
         if target.data == "method_pipe":
             return current_kind
         call = self._expr(target)
         if not isinstance(call, ast.Call):
-            self._fail(target, "pipeline target must be a function call, method call, or identifier")
+            self._fail(
+                target,
+                "pipeline target must be a function call, method call, or identifier",
+            )
         return self._validate_call_kind(current_kind, call, target)
 
     def _validate_call_kind(
         self,
-        current_kind: Optional[str],
+        current_kind: str | None,
         call: ast.Call,
-        item: Union[Tree, Token],
-    ) -> Optional[str]:
+        item: Tree | Token,
+    ) -> str | None:
         if not isinstance(call.func, ast.Name):
             return current_kind
         return self._validate_verb_kind(current_kind, call.func.id, item)
 
     def _validate_verb_kind(
         self,
-        current_kind: Optional[str],
+        current_kind: str | None,
         verb: str,
-        item: Union[Tree, Token],
-    ) -> Optional[str]:
+        item: Tree | Token,
+    ) -> str | None:
         if verb in DF_TO_SEQ_VERBS:
             self._require_kind(current_kind, DF_KIND, verb, item)
             return SEQ_KIND
@@ -435,15 +483,18 @@ class AstBuilder:
 
     def _require_kind(
         self,
-        actual_kind: Optional[str],
+        actual_kind: str | None,
         expected_kind: str,
         verb: str,
-        item: Union[Tree, Token],
+        item: Tree | Token,
     ) -> None:
         if actual_kind is None:
             self._fail(item, f"{verb} requires a known {expected_kind} pipeline")
         if actual_kind != expected_kind:
-            self._fail(item, f"{verb} is a {expected_kind} verb, but the current pipeline is {actual_kind}")
+            self._fail(
+                item,
+                f"{verb} is a {expected_kind} verb, but the current pipeline is {actual_kind}",
+            )
 
     def _rewrite_pipe_call(self, call: ast.Call) -> None:
         self._rewrite_sequence_call(call)
@@ -474,7 +525,9 @@ class AstBuilder:
     def _rewrite_sequence_filter_call(self, call: ast.Call) -> None:
         call.args = [self._sequence_filter_predicate(arg) for arg in call.args]
         call.keywords = [
-            ast.keyword(arg=keyword.arg, value=self._sequence_filter_predicate(keyword.value))
+            ast.keyword(
+                arg=keyword.arg, value=self._sequence_filter_predicate(keyword.value)
+            )
             for keyword in call.keywords
         ]
 
@@ -499,7 +552,10 @@ class AstBuilder:
 
         rewriter = RowExprRewriter()
         call.keywords = [
-            ast.keyword(arg=keyword.arg, value=self._row_lambda(rewriter.visit(keyword.value), keyword.value))
+            ast.keyword(
+                arg=keyword.arg,
+                value=self._row_lambda(rewriter.visit(keyword.value), keyword.value),
+            )
             for keyword in call.keywords
         ]
 
@@ -577,13 +633,17 @@ class AstBuilder:
         children = list(tree.children[1:])
         for op_token, right in zip(children[0::2], children[1::2]):
             current = self._loc(
-                ast.BinOp(left=current, op=self._bin_op(self._token(op_token)), right=self._expr(right)),
+                ast.BinOp(
+                    left=current,
+                    op=self._bin_op(self._token(op_token)),
+                    right=self._expr(right),
+                ),
                 tree,
             )
         return current
 
     def _apply_trailer(
-        self, value: ast.expr, trailer: Union[AttrTrailer, CallTrailer, SubscriptTrailer]
+        self, value: ast.expr, trailer: AttrTrailer | CallTrailer | SubscriptTrailer
     ) -> ast.expr:
         if isinstance(trailer, AttrTrailer):
             node = ast.Attribute(value=value, attr=trailer.name, ctx=ast.Load())
@@ -594,19 +654,25 @@ class AstBuilder:
         node = ast.Subscript(value=value, slice=trailer.index, ctx=ast.Load())
         return self._loc_at(node, trailer.line, trailer.column)
 
-    def _trailer(self, tree: Tree) -> Union[AttrTrailer, CallTrailer, SubscriptTrailer]:
+    def _trailer(self, tree: Tree) -> AttrTrailer | CallTrailer | SubscriptTrailer:
         if tree.data == "attr_trailer":
-            return AttrTrailer(str(self._token(tree.children[0])), tree.meta.line, tree.meta.column)
+            return AttrTrailer(
+                str(self._token(tree.children[0])), tree.meta.line, tree.meta.column
+            )
         if tree.data == "call_trailer":
             args, keywords = self._args(tree.children[0]) if tree.children else ([], [])
             return CallTrailer(args, keywords, tree.meta.line, tree.meta.column)
         if tree.data == "subscript_trailer":
-            return SubscriptTrailer(self._expr(tree.children[0]), tree.meta.line, tree.meta.column)
+            return SubscriptTrailer(
+                self._expr(tree.children[0]), tree.meta.line, tree.meta.column
+            )
         self._fail(tree, f"unsupported trailer {tree.data}")
 
     def _method_pipe(self, tree: Tree) -> MethodPipe:
         name = str(self._token(tree.children[0]))
-        args, keywords = self._args(tree.children[1]) if len(tree.children) > 1 else ([], [])
+        args, keywords = (
+            self._args(tree.children[1]) if len(tree.children) > 1 else ([], [])
+        )
         return MethodPipe(name, args, keywords, tree.meta.line, tree.meta.column)
 
     def _args(self, tree: Tree) -> tuple:
@@ -618,13 +684,17 @@ class AstBuilder:
                 keywords.append(ast.keyword(arg=arg.name, value=arg.value))
             else:
                 if keywords:
-                    self._fail(child, "positional arguments cannot follow keyword arguments")
+                    self._fail(
+                        child, "positional arguments cannot follow keyword arguments"
+                    )
                 args.append(arg)
         return args, keywords
 
-    def _arg(self, tree: Tree) -> Union[ast.expr, KeywordArg]:
+    def _arg(self, tree: Tree) -> ast.expr | KeywordArg:
         if tree.data == "keyword_arg":
-            return KeywordArg(str(self._token(tree.children[0])), self._expr(tree.children[1]))
+            return KeywordArg(
+                str(self._token(tree.children[0])), self._expr(tree.children[1])
+            )
         if tree.data == "positional_arg":
             return self._expr(tree.children[0])
         self._fail(tree, f"unsupported argument {tree.data}")
@@ -651,18 +721,24 @@ class AstBuilder:
         return tree.data == "defer_expr"
 
     def _auto_collect(self, value: ast.expr) -> ast.expr:
-        node = ast.Call(func=ast.Name(id="_auto", ctx=ast.Load()), args=[value], keywords=[])
+        node = ast.Call(
+            func=ast.Name(id="_auto", ctx=ast.Load()), args=[value], keywords=[]
+        )
         return self._loc_at(node, value.lineno, value.col_offset + 1)
 
     def _coerce_declared_value(self, value: ast.expr, declared_kind: str) -> ast.expr:
         func_name = "_as_df" if declared_kind == DF_KIND else "_as_seq"
-        node = ast.Call(func=ast.Name(id=func_name, ctx=ast.Load()), args=[value], keywords=[])
+        node = ast.Call(
+            func=ast.Name(id=func_name, ctx=ast.Load()), args=[value], keywords=[]
+        )
         return self._loc_at(node, value.lineno, value.col_offset + 1)
 
     def _lambda(self, params: list[str], body: ast.expr, tree: Tree) -> ast.Lambda:
         return self._lambda_at(params, body, tree.meta.line, tree.meta.column)
 
-    def _lambda_at(self, params: list[str], body: ast.expr, line: int, column: int) -> ast.Lambda:
+    def _lambda_at(
+        self, params: list[str], body: ast.expr, line: int, column: int
+    ) -> ast.Lambda:
         args = ast.arguments(
             posonlyargs=[],
             args=[self._loc_at(ast.arg(arg=name), line, column) for name in params],
@@ -695,17 +771,21 @@ class AstBuilder:
         }[str(token)]
 
     def _single_tree(self, tree: Tree, data: str) -> Tree:
-        children = [child for child in tree.children if isinstance(child, Tree) and child.data == data]
+        children = [
+            child
+            for child in tree.children
+            if isinstance(child, Tree) and child.data == data
+        ]
         if len(children) != 1:
             self._fail(tree, f"expected one {data} child")
         return children[0]
 
-    def _tree(self, item: Union[Tree, Token]) -> Tree:
+    def _tree(self, item: Tree | Token) -> Tree:
         if not isinstance(item, Tree):
             self._fail(item, "expected tree")
         return item
 
-    def _token(self, item: Union[Tree, Token]) -> Token:
+    def _token(self, item: Tree | Token) -> Token:
         if not isinstance(item, Token):
             self._fail(item, "expected token")
         return item
@@ -723,10 +803,16 @@ class AstBuilder:
         node.end_col_offset = max(column, 0)
         return node
 
-    def _fail(self, item: Union[Tree, Token], message: str) -> None:
-        line = getattr(getattr(item, "meta", None), "line", None) or getattr(item, "line", None)
-        column = getattr(getattr(item, "meta", None), "column", None) or getattr(item, "column", None)
-        location = f"{self.filename}:{line}:{column}" if line and column else self.filename
+    def _fail(self, item: Tree | Token, message: str) -> None:
+        line = getattr(getattr(item, "meta", None), "line", None) or getattr(
+            item, "line", None
+        )
+        column = getattr(getattr(item, "meta", None), "column", None) or getattr(
+            item, "column", None
+        )
+        location = (
+            f"{self.filename}:{line}:{column}" if line and column else self.filename
+        )
         raise SyntaxError(f"{location}: {message}")
 
 
@@ -781,13 +867,17 @@ class TableExprRewriter(ast.NodeTransformer):
         op: ast.operator = ast.BitAnd() if isinstance(node.op, ast.And) else ast.BitOr()
         current = values[0]
         for value in values[1:]:
-            current = self._copy_location(ast.BinOp(left=current, op=op, right=value), node)
+            current = self._copy_location(
+                ast.BinOp(left=current, op=op, right=value), node
+            )
         return current
 
     def visit_UnaryOp(self, node: ast.UnaryOp) -> ast.AST:
         node.operand = self.visit(node.operand)
         if isinstance(node.op, ast.Not):
-            return self._copy_location(ast.UnaryOp(op=ast.Invert(), operand=node.operand), node)
+            return self._copy_location(
+                ast.UnaryOp(op=ast.Invert(), operand=node.operand), node
+            )
         return node
 
     def _copy_location(self, new_node: ast.AST, old_node: ast.AST) -> ast.AST:

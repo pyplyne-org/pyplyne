@@ -8,6 +8,8 @@ From a source checkout:
 
 ```bash
 uv sync --extra dev
+uv run ruff check .
+uv run ruff format --check .
 uv run pytest
 ```
 
@@ -23,6 +25,8 @@ npm run docs:check
 
 - Keep changes focused on one behavior, bug, or documentation improvement.
 - Add or update tests when behavior changes.
+- Run `uv run ruff check .` and `uv run ruff format --check .` before opening
+  a pull request.
 - Run `uv run pytest` before opening a pull request.
 - Run `npm run docs:check` from `site/` when changing docs, examples, editor
   grammar files, or docs generation scripts.

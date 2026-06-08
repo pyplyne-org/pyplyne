@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from types import CodeType
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 import polars as pl
@@ -33,7 +33,7 @@ _MISSING = _MissingDefault()
 
 def run(
     source: str,
-    context: Optional[dict[str, Any]] = None,
+    context: dict[str, Any] | None = None,
     filename: str = "<pyplyne>",
     *,
     capture_output: bool = True,
@@ -69,7 +69,7 @@ def run(
 
 def run_file(
     path: str | Path,
-    context: Optional[dict[str, Any]] = None,
+    context: dict[str, Any] | None = None,
     *,
     capture_output: bool = True,
     raise_on_error: bool = True,
@@ -125,10 +125,10 @@ class PyPlyneExecutionResult:
     stdout: str
     stderr: str
     result: Any = None
-    error: Optional[BaseException] = None
-    phase: Optional[str] = None
+    error: BaseException | None = None
+    phase: str | None = None
     traceback: str = ""
-    shapes: Optional[dict[str, str]] = None
+    shapes: dict[str, str] | None = None
 
     @property
     def ok(self) -> bool:
@@ -144,7 +144,7 @@ class PyPlyneSession:
     shapes, and the most recent expression result across runs.
     """
 
-    def __init__(self, globals_dict: Optional[dict[str, Any]] = None) -> None:
+    def __init__(self, globals_dict: dict[str, Any] | None = None) -> None:
         """Create a session seeded with optional Python globals.
 
         Args:
@@ -162,7 +162,7 @@ class PyPlyneSession:
     def run(
         self,
         source: str,
-        filename: Optional[str] = None,
+        filename: str | None = None,
         *,
         capture_output: bool = True,
         raise_on_error: bool = True,
@@ -201,7 +201,7 @@ class PyPlyneSession:
     def _run_locked(
         self,
         source: str,
-        filename: Optional[str],
+        filename: str | None,
         *,
         capture_output: bool,
         raise_on_error: bool,
@@ -223,7 +223,9 @@ class PyPlyneSession:
         current_phase = "compile"
 
         try:
-            code = self._compile(source, filename, next_shapes, store_result=store_result)
+            code = self._compile(
+                source, filename, next_shapes, store_result=store_result
+            )
             current_phase = "runtime"
             with self._output_context(stdout, stderr, capture_output):
                 exec(code, self.env)
@@ -240,7 +242,9 @@ class PyPlyneSession:
             error = exc
             phase = getattr(exc, "phase", current_phase)
             traceback_text = traceback.format_exc()
-            self.symbol_kinds = self._shapes_for_existing_values(old_shapes, next_shapes)
+            self.symbol_kinds = self._shapes_for_existing_values(
+                old_shapes, next_shapes
+            )
             self.env.pop("__pyplyne_last_result__", None)
             if raise_on_error:
                 raise
@@ -382,7 +386,7 @@ class PyPlyneSession:
         with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
             yield
 
-    def _shape_from_value(self, value: Any) -> Optional[str]:
+    def _shape_from_value(self, value: Any) -> str | None:
         if isinstance(value, (pl.DataFrame, pl.LazyFrame)):
             return DF_KIND
         if isinstance(value, (list, tuple)):
@@ -402,7 +406,9 @@ class PyPlyneSession:
 
 
 class PyPlyneHTTPServer(ThreadingHTTPServer):
-    def __init__(self, server_address: tuple[str, int], session: Optional[PyPlyneSession] = None) -> None:
+    def __init__(
+        self, server_address: tuple[str, int], session: PyPlyneSession | None = None
+    ) -> None:
         super().__init__(server_address, PyPlyneRequestHandler)
         self.session = session or PyPlyneSession()
 
@@ -429,11 +435,12 @@ class PyPlyneRequestHandler(BaseHTTPRequestHandler):
         source = self.rfile.read(length).decode("utf-8")
         params = parse_qs(parsed.query)
         filename = params.get("filename", [None])[0]
-        wants_json = (
-            params.get("format", [""])[0] == "json"
-            or "application/json" in self.headers.get("Accept", "")
+        wants_json = params.get("format", [""])[
+            0
+        ] == "json" or "application/json" in self.headers.get("Accept", "")
+        result = self.server.session.run(
+            source, filename=filename, raise_on_error=False
         )
-        result = self.server.session.run(source, filename=filename, raise_on_error=False)
         status = 200 if result.ok else 500
         if wants_json:
             self._send_json(status, self._json_payload(result))
@@ -450,8 +457,12 @@ class PyPlyneRequestHandler(BaseHTTPRequestHandler):
             "filename": result.filename,
             "stdout": result.stdout,
             "stderr": result.stderr,
-            "result": self._format_value(result.result) if result.result is not None else None,
-            "error": None if result.error is None else f"{type(result.error).__name__}: {result.error}",
+            "result": self._format_value(result.result)
+            if result.result is not None
+            else None,
+            "error": None
+            if result.error is None
+            else f"{type(result.error).__name__}: {result.error}",
             "phase": result.phase,
             "traceback": result.traceback,
             "diagnostic": diagnostic.to_dict() if diagnostic is not None else None,
@@ -468,7 +479,9 @@ class PyPlyneRequestHandler(BaseHTTPRequestHandler):
             chunks.append(self._format_value(result.result) + "\n")
         if result.error is not None:
             diagnostic = build_diagnostic(result)
-            chunks.append((diagnostic.format() if diagnostic else result.traceback) + "\n")
+            chunks.append(
+                (diagnostic.format() if diagnostic else result.traceback) + "\n"
+            )
         if not chunks:
             chunks.append("ok\n")
         return "".join(chunks)
@@ -496,6 +509,6 @@ class PyPlyneRequestHandler(BaseHTTPRequestHandler):
 def create_session_server(
     host: str = "127.0.0.1",
     port: int = 8765,
-    session: Optional[PyPlyneSession] = None,
+    session: PyPlyneSession | None = None,
 ) -> PyPlyneHTTPServer:
     return PyPlyneHTTPServer((host, port), session=session)

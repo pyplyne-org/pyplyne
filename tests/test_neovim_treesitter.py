@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-
 NVIM_ROOT = Path(__file__).resolve().parents[1] / "editors" / "nvim-pyplyne"
 GRAMMAR_ROOT = NVIM_ROOT / "tree-sitter-pyplyne"
 
@@ -69,7 +68,7 @@ def test_neovim_treesitter_readme_documents_installation():
 
     assert "pyplyne.nvim" in readme
     assert 'dir = "/path/to/pyplyne/editors/nvim-pyplyne"' in readme
-    assert "require(\"pyplyne\").setup(opts)" in readme
+    assert 'require("pyplyne").setup(opts)' in readme
     assert "lazy = false" in readme
     assert "parser_config.pyplyne" in readme
     assert "vim.filetype.add" in readme
@@ -187,7 +186,17 @@ def test_neovim_plugin_reports_missing_executable_before_starting_session():
 
 
 def test_neovim_treesitter_highlights_cover_core_language():
-    highlights = (GRAMMAR_ROOT / "queries" / "highlights.scm").read_text(encoding="utf-8")
+    highlights = (GRAMMAR_ROOT / "queries" / "highlights.scm").read_text(
+        encoding="utf-8"
+    )
 
-    for token in ["pipe_operator", "(shape)", "where", "map", "filter", "group_by", "summarize"]:
+    for token in [
+        "pipe_operator",
+        "(shape)",
+        "where",
+        "map",
+        "filter",
+        "group_by",
+        "summarize",
+    ]:
         assert token in highlights

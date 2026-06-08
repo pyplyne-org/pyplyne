@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 from types import CodeType
-from typing import Any, Optional, Union
+from typing import Any
 
 from pyplyne.client import DEFAULT_HOST, DEFAULT_PORT, send_source
 from pyplyne.parser import parse_source
@@ -16,7 +16,7 @@ from pyplyne.transformer import compile_ast
 def compile_source(
     source: str,
     filename: str = "<pyplyne>",
-    symbol_kinds: Optional[dict[str, str]] = None,
+    symbol_kinds: dict[str, str] | None = None,
 ) -> CodeType:
     tree = parse_source(source, filename=filename)
     module = compile_ast(tree, filename=filename, symbol_kinds=symbol_kinds)
@@ -26,7 +26,7 @@ def compile_source(
 def run_source(
     source: str,
     filename: str = "<pyplyne>",
-    globals_dict: Optional[dict[str, Any]] = None,
+    globals_dict: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     env = runtime_globals()
     if globals_dict:
@@ -37,12 +37,12 @@ def run_source(
     return env
 
 
-def run_file(path: Union[str, Path]) -> dict[str, Any]:
+def run_file(path: str | Path) -> dict[str, Any]:
     file_path = Path(path)
     return run_source(file_path.read_text(encoding="utf-8"), filename=str(file_path))
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv and argv[0] in {"run", "repl", "serve", "send"}:
         command = argv.pop(0)
@@ -57,7 +57,9 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 
 def _run_command(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="pyplyne run", description="Run a PyPlyne script.")
+    parser = argparse.ArgumentParser(
+        prog="pyplyne run", description="Run a PyPlyne script."
+    )
     parser.add_argument("script", help="Path to a .pyplyne script")
     args = parser.parse_args(argv)
 
@@ -69,7 +71,9 @@ def _run_command(argv: list[str]) -> int:
 
 
 def _repl_command(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="pyplyne repl", description="Start a persistent PyPlyne REPL.")
+    parser = argparse.ArgumentParser(
+        prog="pyplyne repl", description="Start a persistent PyPlyne REPL."
+    )
     parser.add_argument(
         "--load",
         action="append",
@@ -87,7 +91,9 @@ def _repl_command(argv: list[str]) -> int:
 
 
 def _serve_command(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="pyplyne serve", description="Start a persistent PyPlyne HTTP session.")
+    parser = argparse.ArgumentParser(
+        prog="pyplyne serve", description="Start a persistent PyPlyne HTTP session."
+    )
     parser.add_argument("--host", default=DEFAULT_HOST, help="Host to bind")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Port to bind")
     parser.add_argument(
@@ -114,21 +120,39 @@ def _serve_command(argv: list[str]) -> int:
 
 
 def _send_command(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="pyplyne send", description="Send PyPlyne source to a persistent session.")
+    parser = argparse.ArgumentParser(
+        prog="pyplyne send", description="Send PyPlyne source to a persistent session."
+    )
     source = parser.add_mutually_exclusive_group()
     source.add_argument("--expr", help="PyPlyne source to send")
     source.add_argument("--file", help="Read PyPlyne source from a file")
-    parser.add_argument("--url", help="Session server URL. Defaults to PYPLYNE_URL or http://127.0.0.1:8765")
-    parser.add_argument("--host", default=DEFAULT_HOST, help="Host to use when --url and PYPLYNE_URL are unset")
-    parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Port to use when --url and PYPLYNE_URL are unset")
-    parser.add_argument("--json", action="store_true", help="Request structured JSON output")
+    parser.add_argument(
+        "--url",
+        help="Session server URL. Defaults to PYPLYNE_URL or http://127.0.0.1:8765",
+    )
+    parser.add_argument(
+        "--host",
+        default=DEFAULT_HOST,
+        help="Host to use when --url and PYPLYNE_URL are unset",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=DEFAULT_PORT,
+        help="Port to use when --url and PYPLYNE_URL are unset",
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="Request structured JSON output"
+    )
     parser.add_argument(
         "--source-name",
         "--filename",
         dest="filename",
         help="Virtual source name to use in session diagnostics and tracebacks",
     )
-    parser.add_argument("--timeout", type=float, default=30, help="Request timeout in seconds")
+    parser.add_argument(
+        "--timeout", type=float, default=30, help="Request timeout in seconds"
+    )
     args = parser.parse_args(argv)
 
     if args.expr is not None:
