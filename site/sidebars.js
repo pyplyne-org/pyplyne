@@ -60,7 +60,7 @@ const sidebars = {
         description: 'Architecture and maintainer notes.',
       },
       collapsed: true,
-      items: ['architecture', 'sites-used-for-inspiration'],
+      items: ['architecture', 'release-versioning', 'sites-used-for-inspiration'],
     },
   ],
 };

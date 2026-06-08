@@ -28,7 +28,7 @@ function walkMarkdownFiles(directory) {
 }
 
 function frontmatterTextFor(text) {
-  const match = text.match(/^---\n([\s\S]*?)\n---\n/);
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) {
     return null;
   }
@@ -45,7 +45,7 @@ function parseFrontmatter(frontmatter) {
   }
   return Object.fromEntries(
     frontmatter
-      .split('\n')
+      .split(/\r?\n/)
       .map((line) => line.match(/^([^:]+):\s*(.*)$/))
       .filter(Boolean)
       .map((match) => [match[1].trim(), match[2].trim().replace(/^["']|["']$/g, '')]),
@@ -247,6 +247,10 @@ for (const example of catalog) {
     execFileSync('uv', ['run', 'pyplyne', example.file], {
       cwd: projectRoot,
       encoding: 'utf8',
+      env: {
+        ...process.env,
+        PYTHONIOENCODING: 'utf-8',
+      },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
   } catch (error) {
