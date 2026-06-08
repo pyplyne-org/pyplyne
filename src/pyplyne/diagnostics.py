@@ -3,26 +3,27 @@ from __future__ import annotations
 import linecache
 import re
 from dataclasses import dataclass
-from typing import Any, Optional
-
+from typing import Any
 
 LOCATION_RE = re.compile(
     r"^(?P<filename>.+):(?P<line>\d+):(?P<column>\d+): (?P<message>.*)$"
 )
-TRACEBACK_FILE_RE = re.compile(r'^\s*File "(?P<filename>.+)", line (?P<line>\d+), in .*$')
+TRACEBACK_FILE_RE = re.compile(
+    r'^\s*File "(?P<filename>.+)", line (?P<line>\d+), in .*$'
+)
 
 
 @dataclass(frozen=True)
 class Diagnostic:
-    phase: Optional[str]
+    phase: str | None
     error_type: str
     message: str
     filename: str
-    line: Optional[int] = None
-    column: Optional[int] = None
-    source: Optional[str] = None
-    caret: Optional[str] = None
-    hint: Optional[str] = None
+    line: int | None = None
+    column: int | None = None
+    source: str | None = None
+    caret: str | None = None
+    hint: str | None = None
 
     def format(self) -> str:
         phase = f"{self.phase} " if self.phase else ""
@@ -62,7 +63,7 @@ class Diagnostic:
         }
 
 
-def build_diagnostic(result: Any) -> Optional[Diagnostic]:
+def build_diagnostic(result: Any) -> Diagnostic | None:
     if result.error is None:
         return None
 
@@ -71,8 +72,8 @@ def build_diagnostic(result: Any) -> Optional[Diagnostic]:
     first_line = raw_message.splitlines()[0] if raw_message else type(error).__name__
     error_type = _public_error_type(error)
     filename = result.filename
-    line: Optional[int] = None
-    column: Optional[int] = None
+    line: int | None = None
+    column: int | None = None
     message = first_line
 
     location = LOCATION_RE.match(first_line)
@@ -110,9 +111,9 @@ def build_diagnostic(result: Any) -> Optional[Diagnostic]:
 @dataclass(frozen=True)
 class _TracebackLocation:
     line: int
-    column: Optional[int] = None
-    source: Optional[str] = None
-    caret: Optional[str] = None
+    column: int | None = None
+    source: str | None = None
+    caret: str | None = None
 
 
 def _public_error_type(error: BaseException) -> str:
@@ -121,7 +122,9 @@ def _public_error_type(error: BaseException) -> str:
     return type(error).__name__
 
 
-def _location_from_traceback(traceback_text: str, filename: str) -> Optional[_TracebackLocation]:
+def _location_from_traceback(
+    traceback_text: str, filename: str
+) -> _TracebackLocation | None:
     lines = traceback_text.splitlines()
     for index, line in enumerate(lines):
         match = TRACEBACK_FILE_RE.match(line)
@@ -144,7 +147,7 @@ def _location_from_traceback(traceback_text: str, filename: str) -> Optional[_Tr
     return None
 
 
-def _traceback_source_line(lines: list[str], index: int) -> Optional[str]:
+def _traceback_source_line(lines: list[str], index: int) -> str | None:
     if index >= len(lines):
         return None
     line = lines[index]
@@ -153,7 +156,7 @@ def _traceback_source_line(lines: list[str], index: int) -> Optional[str]:
     return line[4:]
 
 
-def _source_line(filename: str, line: Optional[int]) -> Optional[str]:
+def _source_line(filename: str, line: int | None) -> str | None:
     if line is None:
         return None
     source = linecache.getline(filename, line)
@@ -166,14 +169,14 @@ def _caret(column: int) -> str:
     return " " * max(column - 1, 0) + "^"
 
 
-def _positive_int(value: str) -> Optional[int]:
+def _positive_int(value: str) -> int | None:
     number = int(value)
     if number < 1:
         return None
     return number
 
 
-def _hint(message: str, error_type: str) -> Optional[str]:
+def _hint(message: str, error_type: str) -> str | None:
     if "seq annotation expects iterable data" in message:
         return "Use seq with iterable values, or wrap a scalar in [...] for a one-item sequence."
     if "df annotation expects table-shaped data" in message:
@@ -187,7 +190,7 @@ def _hint(message: str, error_type: str) -> Optional[str]:
     if "requires a known df pipeline" in message:
         return "Annotate the pipeline source with df, for example: result = df values |> where(...)."
     if "shape annotations go on the right-hand side" in message:
-        return "Write the annotation after =, for example: sales = df read_csv(\"sales.csv\")."
+        return 'Write the annotation after =, for example: sales = df read_csv("sales.csv").'
     if "group_by(...) must be followed by summarize" in message:
         return "Add summarize(...) after group_by(...), or remove group_by(...) before materializing."
     if error_type == "ColumnNotFoundError":

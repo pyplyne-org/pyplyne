@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -47,8 +49,74 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --extra dev
 
+      - name: Run Ruff
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
       - name: Run tests
-        run: uv run pytest
+        shell: bash
+        run: |
+          uv run pytest \
+            --cov=pyplyne \
+            --cov-report=term-missing \
+            --cov-report=markdown-append:"$GITHUB_STEP_SUMMARY" \
+            --cov-report=markdown:coverage-summary.md
+
+      - name: Comment coverage summary
+        if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          rows = []
+          total = None
+          for line in Path("coverage-summary.md").read_text(encoding="utf-8").splitlines():
+              if not line.startswith("|"):
+                  continue
+              cells = [cell.strip() for cell in line.strip("|").split("|")]
+              if len(cells) < 6 or cells[0] in {"Name", "---------------------------"}:
+                  continue
+
+              name = cells[0].removeprefix("**").removesuffix("**")
+              cover_text = cells[5].removeprefix("**").removesuffix("**")
+              match = re.fullmatch(r"(\d+)%", cover_text)
+              if match is None:
+                  continue
+
+              coverage = int(match.group(1))
+              if name == "TOTAL":
+                  total = coverage
+              else:
+                  rows.append((coverage, name))
+
+          lowest = sorted(rows)[:3]
+          lines = [
+              "<!-- pyplyne-coverage-summary -->",
+              "## Coverage summary",
+              "",
+              f"Total coverage: **{total}%**",
+              "",
+              "Branch coverage is enabled. Full per-file details are in the "
+              "`Python / ubuntu-latest` job summary.",
+          ]
+          if lowest:
+              lines.extend(["", "Lowest files:"])
+              lines.extend(f"- `{name}` - {coverage}%" for coverage, name in lowest)
+
+          Path("coverage-comment.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          PY
+
+          gh pr comment "$PR_NUMBER" \
+            --repo "$GITHUB_REPOSITORY" \
+            --body-file coverage-comment.md \
+            --edit-last \
+            --create-if-none
 
       - name: Build package
         run: uv build

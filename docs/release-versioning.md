@@ -54,6 +54,10 @@ passed release-prep CI. Users can pin that tag from the Git install URL:
 uv add "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git@v0.1.0"
 ```
 
+Merging a release-prep PR does not publish a release by itself. It prepares a
+known-good commit on `main`; the release happens when maintainers create and
+push the version tag.
+
 Before creating a release tag:
 
 ```bash

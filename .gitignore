@@ -1,5 +1,12 @@
 .venv/
 .pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+coverage-summary.md
+coverage-comment.md
+htmlcov/
 __pycache__/
 *.py[cod]
 *.egg-info/

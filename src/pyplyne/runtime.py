@@ -6,10 +6,9 @@ import functools
 import json
 from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import polars as pl
-
 
 _missing = object()
 
@@ -51,7 +50,9 @@ def filter(data: Iterable[Any], predicate: Callable[[Any], bool]) -> list[Any]:
     return [item for item in data if predicate(item)]
 
 
-def reduce(data: Iterable[Any], func: Callable[[Any, Any], Any], initial: Any = _missing) -> Any:
+def reduce(
+    data: Iterable[Any], func: Callable[[Any, Any], Any], initial: Any = _missing
+) -> Any:
     iterator = iter(data)
     if initial is _missing:
         return functools.reduce(func, iterator)
@@ -117,7 +118,9 @@ def _auto(data: Any) -> Any:
     if isinstance(data, pl.LazyFrame):
         return data.collect()
     if _is_polars_group_by(data):
-        raise TypeError("group_by(...) must be followed by summarize(...) before the pipeline can run")
+        raise TypeError(
+            "group_by(...) must be followed by summarize(...) before the pipeline can run"
+        )
     return data
 
 
@@ -127,13 +130,17 @@ def _as_df(data: Any) -> pl.DataFrame:
     if isinstance(data, pl.DataFrame):
         return data
     if _is_polars_group_by(data):
-        raise TypeError("group_by(...) must be followed by summarize(...) before assigning to a df")
+        raise TypeError(
+            "group_by(...) must be followed by summarize(...) before assigning to a df"
+        )
     if isinstance(data, Mapping):
         return pl.DataFrame([data])
     try:
         return pl.DataFrame(data)
     except TypeError:
-        raise TypeError(f"df annotation expects table-shaped data, got {_type_name(data)}") from None
+        raise TypeError(
+            f"df annotation expects table-shaped data, got {_type_name(data)}"
+        ) from None
 
 
 def _as_seq(data: Any) -> Any:
@@ -142,7 +149,9 @@ def _as_seq(data: Any) -> Any:
     if isinstance(data, pl.DataFrame):
         return data.to_dicts()
     if isinstance(data, Mapping):
-        raise TypeError("seq annotation expects iterable data, got mapping; wrap it in [...] for a row sequence")
+        raise TypeError(
+            "seq annotation expects iterable data, got mapping; wrap it in [...] for a row sequence"
+        )
     if isinstance(data, (str, bytes, bytearray)):
         raise TypeError(f"seq annotation expects iterable data, got {_type_name(data)}")
     if not isinstance(data, Iterable):
@@ -150,23 +159,23 @@ def _as_seq(data: Any) -> Any:
     return data
 
 
-def read_csv(path: Union[str, Path], **kwargs: Any) -> Any:
+def read_csv(path: str | Path, **kwargs: Any) -> Any:
     return pl.scan_csv(path, **kwargs)
 
 
-def read_json(path: Union[str, Path], **kwargs: Any) -> pl.DataFrame:
+def read_json(path: str | Path, **kwargs: Any) -> pl.DataFrame:
     return pl.read_json(path, **kwargs)
 
 
-def read_parquet(path: Union[str, Path], **kwargs: Any) -> pl.DataFrame:
+def read_parquet(path: str | Path, **kwargs: Any) -> pl.DataFrame:
     return pl.read_parquet(path, **kwargs)
 
 
-def read_excel(path: Union[str, Path], **kwargs: Any) -> Any:
+def read_excel(path: str | Path, **kwargs: Any) -> Any:
     return pl.read_excel(path, **kwargs)
 
 
-def write_csv(data: Any, path: Union[str, Path], **kwargs: Any) -> Any:
+def write_csv(data: Any, path: str | Path, **kwargs: Any) -> Any:
     if isinstance(data, pl.LazyFrame):
         data.sink_csv(path, **kwargs)
         return data
@@ -180,14 +189,16 @@ def write_csv(data: Any, path: Union[str, Path], **kwargs: Any) -> Any:
         Path(path).write_text("", encoding=kwargs.pop("encoding", "utf-8"))
         return data
 
-    with Path(path).open("w", newline="", encoding=kwargs.pop("encoding", "utf-8")) as handle:
+    with Path(path).open(
+        "w", newline="", encoding=kwargs.pop("encoding", "utf-8")
+    ) as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()), **kwargs)
         writer.writeheader()
         writer.writerows(rows)
     return data
 
 
-def write_json(data: Any, path: Union[str, Path], **kwargs: Any) -> Any:
+def write_json(data: Any, path: str | Path, **kwargs: Any) -> Any:
     if isinstance(data, pl.LazyFrame):
         data = data.collect()
 
@@ -199,7 +210,7 @@ def write_json(data: Any, path: Union[str, Path], **kwargs: Any) -> Any:
     return data
 
 
-def write_parquet(data: Any, path: Union[str, Path], **kwargs: Any) -> Any:
+def write_parquet(data: Any, path: str | Path, **kwargs: Any) -> Any:
     if isinstance(data, pl.LazyFrame):
         data.sink_parquet(path, **kwargs)
         return data
@@ -212,7 +223,7 @@ def write_parquet(data: Any, path: Union[str, Path], **kwargs: Any) -> Any:
     return data
 
 
-def write_excel(data: Any, path: Union[str, Path], **kwargs: Any) -> Any:
+def write_excel(data: Any, path: str | Path, **kwargs: Any) -> Any:
     if isinstance(data, pl.LazyFrame):
         data = data.collect()
 

@@ -9,8 +9,8 @@ import pytest
 
 from pyplyne import run as run_pyplyne
 from pyplyne import run_file as run_pyplyne_file
-from pyplyne.client import run_endpoint, send_source
 from pyplyne.cli import main
+from pyplyne.client import run_endpoint, send_source
 from pyplyne.repl import _run_source
 from pyplyne.session import PyPlyneSession, create_session_server
 
@@ -37,7 +37,9 @@ sales = df [
 ]
 """
     )
-    session.run("large_sales = sales |> where(amount > 100) |> select(region, amount)\n")
+    session.run(
+        "large_sales = sales |> where(amount > 100) |> select(region, amount)\n"
+    )
 
     assert isinstance(session.env["sales"], pl.DataFrame)
     assert session.env["large_sales"].to_dicts() == [{"region": "north", "amount": 120}]
@@ -275,7 +277,9 @@ def test_session_run_can_return_compile_errors_without_mutating_shapes():
     session = PyPlyneSession()
     session.run("numbers = seq [1, 2, 3]\n")
 
-    result = session.run("broken = numbers |> where(amount > 1)\n", raise_on_error=False)
+    result = session.run(
+        "broken = numbers |> where(amount > 1)\n", raise_on_error=False
+    )
 
     assert not result.ok
     assert result.phase == "compile"
@@ -289,7 +293,9 @@ def test_session_run_can_return_compile_errors_without_mutating_shapes():
 def test_session_run_can_return_runtime_errors_and_keep_prior_statements():
     session = PyPlyneSession()
 
-    result = session.run("numbers = seq [1, 2, 3]\nnumbers |> map()\n", raise_on_error=False)
+    result = session.run(
+        "numbers = seq [1, 2, 3]\nnumbers |> map()\n", raise_on_error=False
+    )
 
     assert not result.ok
     assert result.phase == "runtime"
@@ -332,7 +338,9 @@ def test_http_session_runs_raw_plyne_and_persists_state_between_requests():
 
     try:
         first = _post(url, b"numbers = seq [1, 2, 3]\n")
-        second = _post(url + "?format=json", b"numbers |> map(_ + 1)\n", accept="application/json")
+        second = _post(
+            url + "?format=json", b"numbers |> map(_ + 1)\n", accept="application/json"
+        )
     finally:
         server.shutdown()
         server.server_close()
@@ -376,7 +384,7 @@ def test_http_session_returns_traceback_for_errors():
 
     try:
         with pytest.raises(HTTPError) as excinfo:
-            _post(url, b"rows = seq [{\"amount\": 1}]\nbad = rows |> where(amount > 0)\n")
+            _post(url, b'rows = seq [{"amount": 1}]\nbad = rows |> where(amount > 0)\n')
         body = excinfo.value.read().decode("utf-8")
     finally:
         server.shutdown()
@@ -432,11 +440,16 @@ def test_http_session_json_classifies_compile_shape_errors_and_rolls_back():
 
 def test_http_session_json_classifies_runtime_call_errors_and_keeps_prior_state():
     session = PyPlyneSession()
-    payload = _post_json_error("numbers = seq [1, 2, 3]\nnumbers |> map()\n", session=session)
+    payload = _post_json_error(
+        "numbers = seq [1, 2, 3]\nnumbers |> map()\n", session=session
+    )
 
     assert payload["ok"] is False
     assert payload["phase"] == "runtime"
-    assert payload["error"] == "TypeError: map() missing 1 required positional argument: 'func'"
+    assert (
+        payload["error"]
+        == "TypeError: map() missing 1 required positional argument: 'func'"
+    )
     assert payload["shapes"] == {"numbers": "seq"}
     assert session.env["numbers"] == [1, 2, 3]
     assert "__pyplyne_last_result__" not in session.env
@@ -459,7 +472,9 @@ def test_http_session_json_classifies_bad_seq_annotation_runtime_errors():
 
     assert payload["ok"] is False
     assert payload["phase"] == "runtime"
-    assert payload["error"] == "TypeError: seq annotation expects iterable data, got int"
+    assert (
+        payload["error"] == "TypeError: seq annotation expects iterable data, got int"
+    )
     assert payload["diagnostic"]["phase"] == "runtime"
     assert payload["diagnostic"]["line"] == 1
     assert payload["diagnostic"]["source"] == "nonsense = seq 42"
@@ -474,7 +489,10 @@ def test_http_session_json_classifies_bad_df_annotation_runtime_errors():
 
     assert payload["ok"] is False
     assert payload["phase"] == "runtime"
-    assert payload["error"] == "TypeError: df annotation expects table-shaped data, got int"
+    assert (
+        payload["error"]
+        == "TypeError: df annotation expects table-shaped data, got int"
+    )
     assert payload["shapes"] == {}
     assert "nonsense" not in session.env
 
@@ -485,7 +503,9 @@ def test_repl_prints_concise_errors_without_internal_traceback(capsys):
     _run_source(session, "nonsense = seq 42\n")
     output = capsys.readouterr()
 
-    assert output.out.startswith("runtime error: TypeError: seq annotation expects iterable data, got int\n")
+    assert output.out.startswith(
+        "runtime error: TypeError: seq annotation expects iterable data, got int\n"
+    )
     assert " --> <pyplyne-session:1>:1:" in output.out
     assert "1 | nonsense = seq 42" in output.out
     assert "hint: Use seq with iterable values" in output.out
@@ -524,7 +544,9 @@ def test_http_session_json_classifies_numbered_placeholder_gap_errors():
     assert payload["ok"] is False
     assert payload["phase"] == "compile"
     assert payload["error"].startswith("SyntaxError: <pyplyne-session:")
-    assert "numbered placeholders must start at _1 and be consecutive" in payload["error"]
+    assert (
+        "numbered placeholders must start at _1 and be consecutive" in payload["error"]
+    )
     assert payload["shapes"] == {"numbers": "seq"}
 
 
@@ -567,7 +589,10 @@ def test_http_session_json_classifies_unfinished_group_by_runtime_errors():
 def test_client_builds_default_and_overridden_run_urls(monkeypatch):
     assert run_endpoint() == "http://127.0.0.1:8765/run"
     assert run_endpoint(host="0.0.0.0", port=9000) == "http://0.0.0.0:9000/run"
-    assert run_endpoint(url="127.0.0.1:9999", json_output=True) == "http://127.0.0.1:9999/run?format=json"
+    assert (
+        run_endpoint(url="127.0.0.1:9999", json_output=True)
+        == "http://127.0.0.1:9999/run?format=json"
+    )
 
     monkeypatch.setenv("PYPLYNE_URL", "http://example.test:1234")
     assert run_endpoint() == "http://example.test:1234/run"
@@ -581,7 +606,9 @@ def test_client_send_source_uses_port_override_and_persists_state():
 
     try:
         first = send_source("numbers = seq [1, 2, 3]\n", host=host, port=port)
-        second = send_source("numbers |> map(_ * 10)\n", host=host, port=port, json_output=True)
+        second = send_source(
+            "numbers |> map(_ * 10)\n", host=host, port=port, json_output=True
+        )
     finally:
         server.shutdown()
         server.server_close()
@@ -601,9 +628,35 @@ def test_send_cli_sends_expression_to_port_override(capsys):
     host, port = server.server_address
 
     try:
-        assert main(["send", "--host", host, "--port", str(port), "--expr", "numbers = seq [1, 2]"]) == 0
+        assert (
+            main(
+                [
+                    "send",
+                    "--host",
+                    host,
+                    "--port",
+                    str(port),
+                    "--expr",
+                    "numbers = seq [1, 2]",
+                ]
+            )
+            == 0
+        )
         first = capsys.readouterr()
-        assert main(["send", "--host", host, "--port", str(port), "--expr", "numbers |> map(_ + 1)"]) == 0
+        assert (
+            main(
+                [
+                    "send",
+                    "--host",
+                    host,
+                    "--port",
+                    str(port),
+                    "--expr",
+                    "numbers |> map(_ + 1)",
+                ]
+            )
+            == 0
+        )
         second = capsys.readouterr()
     finally:
         server.shutdown()
@@ -691,7 +744,9 @@ def _get(url: str) -> str:
         return response.read().decode("utf-8")
 
 
-def _post_json_error(source: str, session: PyPlyneSession | None = None) -> dict[str, object]:
+def _post_json_error(
+    source: str, session: PyPlyneSession | None = None
+) -> dict[str, object]:
     server = create_session_server("127.0.0.1", 0, session=session)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()

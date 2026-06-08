@@ -4,17 +4,17 @@ from pathlib import Path
 import polars as pl
 import pytest
 
-from pyplyne.parser import parse_source
 from pyplyne.cli import run_file, run_source
+from pyplyne.parser import parse_source
 from pyplyne.transformer import compile_ast, iter_nodes
 
 
 def test_string_literals_preserve_windows_paths():
     env = run_source(
-        r'''
+        r"""
 path = "C:\Users\example\AppData\Local\sales.csv"
 tab_like_path = "C:\Users\example\test\sales.csv"
-''',
+""",
         filename="windows_path_string_test.pyplyne",
     )
 
@@ -24,9 +24,9 @@ tab_like_path = "C:\Users\example\test\sales.csv"
 
 def test_string_literals_keep_python_style_escapes():
     env = run_source(
-        r'''
+        r"""
 message = "north\nsouth"
-''',
+""",
         filename="string_escape_test.pyplyne",
     )
 
@@ -87,7 +87,9 @@ result = numbers
 
 
 def test_numbered_placeholders_must_start_at_one_and_be_consecutive():
-    with pytest.raises(SyntaxError, match="numbered placeholders must start at _1 and be consecutive"):
+    with pytest.raises(
+        SyntaxError, match="numbered placeholders must start at _1 and be consecutive"
+    ):
         run_source(
             """
 numbers = seq [1, 2, 3]
@@ -125,8 +127,20 @@ reviewed = rows
     )
 
     assert env["reviewed"] == [
-        {"region": "north", "amount": 120, "double": 240, "label": "north-120", "reviewed": True},
-        {"region": "south", "amount": 80, "double": 160, "label": "south-80", "reviewed": True},
+        {
+            "region": "north",
+            "amount": 120,
+            "double": 240,
+            "label": "north-120",
+            "reviewed": True,
+        },
+        {
+            "region": "south",
+            "amount": 80,
+            "double": 160,
+            "label": "south-80",
+            "reviewed": True,
+        },
     ]
     assert env["rows"] == [
         {"region": "north", "amount": 120, "temp": "x"},
@@ -339,20 +353,30 @@ table_again = row_dicts |> to_table()
 
 
 def test_seq_annotation_rejects_non_iterable_values_immediately():
-    with pytest.raises(TypeError, match="seq annotation expects iterable data, got int"):
+    with pytest.raises(
+        TypeError, match="seq annotation expects iterable data, got int"
+    ):
         run_source("nonsense = seq 42\n", filename="bad_seq_int_test.pyplyne")
 
-    with pytest.raises(TypeError, match="seq annotation expects iterable data, got type"):
+    with pytest.raises(
+        TypeError, match="seq annotation expects iterable data, got type"
+    ):
         run_source("nonsense = seq int\n", filename="bad_seq_type_test.pyplyne")
 
 
 def test_seq_annotation_rejects_mapping_values_immediately():
-    with pytest.raises(TypeError, match=r"seq annotation expects iterable data, got mapping"):
-        run_source('row = seq {"amount": 120}\n', filename="bad_seq_mapping_test.pyplyne")
+    with pytest.raises(
+        TypeError, match=r"seq annotation expects iterable data, got mapping"
+    ):
+        run_source(
+            'row = seq {"amount": 120}\n', filename="bad_seq_mapping_test.pyplyne"
+        )
 
 
 def test_df_annotation_reports_non_table_values_clearly():
-    with pytest.raises(TypeError, match="df annotation expects table-shaped data, got int"):
+    with pytest.raises(
+        TypeError, match="df annotation expects table-shaped data, got int"
+    ):
         run_source("nonsense = df 42\n", filename="bad_df_int_test.pyplyne")
 
 
@@ -457,13 +481,29 @@ result = rows
     )
 
     assert env["result"].to_dicts() == [
-        {"region": "south", "total": 200, "average": 200.0, "smallest": 200, "largest": 200, "rows": 1},
-        {"region": "north", "total": 200, "average": 100.0, "smallest": 50, "largest": 150, "rows": 2},
+        {
+            "region": "south",
+            "total": 200,
+            "average": 200.0,
+            "smallest": 200,
+            "largest": 200,
+            "rows": 1,
+        },
+        {
+            "region": "north",
+            "total": 200,
+            "average": 100.0,
+            "smallest": 50,
+            "largest": 150,
+            "rows": 2,
+        },
     ]
 
 
 def test_group_by_without_summarize_has_clear_runtime_error():
-    with pytest.raises(TypeError, match=r"group_by\(\.\.\.\) must be followed by summarize"):
+    with pytest.raises(
+        TypeError, match=r"group_by\(\.\.\.\) must be followed by summarize"
+    ):
         run_source(
             """
 sales = df [{"region": "north", "amount": 120}]
@@ -543,7 +583,10 @@ result = seq numbers |> map(_ * 2)
 
 
 def test_import_compiles_to_native_import_ast():
-    module = compile_ast(parse_source("import math as m\nanswer = m.sqrt(81)\n"), filename="import_test.pyplyne")
+    module = compile_ast(
+        parse_source("import math as m\nanswer = m.sqrt(81)\n"),
+        filename="import_test.pyplyne",
+    )
 
     imports = list(iter_nodes(module, ast.Import))
     assert imports
@@ -569,7 +612,9 @@ suffix = Path("data.csv").suffix
 def test_read_csv_write_csv_collect_and_shape_conversions(tmp_path):
     input_path = tmp_path / "sales.csv"
     output_path = tmp_path / "summary.csv"
-    input_path.write_text("region,amount\nnorth,120\nsouth,80\nnorth,220\n", encoding="utf-8")
+    input_path.write_text(
+        "region,amount\nnorth,120\nsouth,80\nnorth,220\n", encoding="utf-8"
+    )
 
     env = run_source(
         f"""
@@ -745,12 +790,16 @@ result = rows
 
 def test_bare_tabular_expression_compiles_to_column_call():
     module = compile_ast(
-        parse_source("rows = df [{\"amount\": 1}]\nresult = rows |> where(amount > 100)\n"),
+        parse_source(
+            'rows = df [{"amount": 1}]\nresult = rows |> where(amount > 100)\n'
+        ),
         filename="expr_compile_test.pyplyne",
     )
 
     calls = [node for node in ast.walk(module) if isinstance(node, ast.Call)]
-    assert any(isinstance(call.func, ast.Name) and call.func.id == "_col" for call in calls)
+    assert any(
+        isinstance(call.func, ast.Name) and call.func.id == "_col" for call in calls
+    )
 
 
 def test_traceback_uses_dsl_filename_and_line():
@@ -764,7 +813,10 @@ result = numbers
         run_source(source, filename="broken_pipeline.pyplyne")
 
     traceback = excinfo.traceback
-    assert any(str(frame.path).endswith("broken_pipeline.pyplyne") and frame.lineno + 1 == 4 for frame in traceback)
+    assert any(
+        str(frame.path).endswith("broken_pipeline.pyplyne") and frame.lineno + 1 == 4
+        for frame in traceback
+    )
 
 
 def test_method_pipe_threads_value_as_receiver():
@@ -839,9 +891,27 @@ def test_record_fields_example_runs():
     }
     assert "debug" not in env["without_debug"][0]
     assert env["projected"] == [
-        {"region": "north", "amount": 120, "net": 110, "reviewed": True, "label": "north-120"},
-        {"region": "south", "amount": 80, "net": 75, "reviewed": False, "label": "south-80"},
-        {"region": "north", "amount": 220, "net": 200, "reviewed": True, "label": "north-220"},
+        {
+            "region": "north",
+            "amount": 120,
+            "net": 110,
+            "reviewed": True,
+            "label": "north-120",
+        },
+        {
+            "region": "south",
+            "amount": 80,
+            "net": 75,
+            "reviewed": False,
+            "label": "south-80",
+        },
+        {
+            "region": "north",
+            "amount": 220,
+            "net": 200,
+            "reviewed": True,
+            "label": "north-220",
+        },
     ]
 
 

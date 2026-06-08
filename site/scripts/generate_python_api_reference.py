@@ -8,7 +8,6 @@ from typing import Any
 
 import pyplyne as pyplyne_api
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_PATH = PROJECT_ROOT / "docs" / "generated-python-api-reference.md"
 SECTION_NAMES = {"Args", "Attributes", "Returns", "Raises"}
@@ -128,12 +127,9 @@ def wrapped_signature(name: str, signature: inspect.Signature) -> str:
         lines.append(f"    {parameter},")
 
         next_parameter = parameters[index + 1] if index + 1 < len(parameters) else None
-        if (
-            parameter.kind is inspect.Parameter.POSITIONAL_ONLY
-            and (
-                next_parameter is None
-                or next_parameter.kind is not inspect.Parameter.POSITIONAL_ONLY
-            )
+        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY and (
+            next_parameter is None
+            or next_parameter.kind is not inspect.Parameter.POSITIONAL_ONLY
         ):
             lines.append("    /,")
 
@@ -185,11 +181,17 @@ def rendered_docstring(obj: Any, heading_level: int = 3) -> str:
     heading = "#" * heading_level
     parts = [parsed["summary"]]
     if parsed["args"]:
-        parts.extend(["", f"{heading} Parameters", "", parameters_table(parsed["args"])])
+        parts.extend(
+            ["", f"{heading} Parameters", "", parameters_table(parsed["args"])]
+        )
     if parsed["returns"]:
-        parts.extend(["", f"{heading} Returns", "", typed_table("Type", parsed["returns"])])
+        parts.extend(
+            ["", f"{heading} Returns", "", typed_table("Type", parsed["returns"])]
+        )
     if parsed["raises"]:
-        parts.extend(["", f"{heading} Raises", "", typed_table("Type", parsed["raises"])])
+        parts.extend(
+            ["", f"{heading} Raises", "", typed_table("Type", parsed["raises"])]
+        )
     return "\n".join(parts).strip()
 
 
@@ -216,7 +218,9 @@ def dataclass_fields_section(cls: type[Any], descriptions: dict[str, str]) -> st
         else:
             default = "required"
         description = markdown_text(descriptions.get(field.name, ""))
-        rows.append(f"| `{field.name}` | `{field.type}` | `{default}` | {description} |")
+        rows.append(
+            f"| `{field.name}` | `{field.type}` | `{default}` | {description} |"
+        )
     return "\n".join(rows)
 
 
@@ -227,7 +231,9 @@ def property_section(cls: type[Any], property_names: list[str]) -> str:
     ]
     for property_name in property_names:
         prop = getattr(cls, property_name)
-        rows.append(f"| `{property_name}` | {markdown_text(inspect.getdoc(prop) or '')} |")
+        rows.append(
+            f"| `{property_name}` | {markdown_text(inspect.getdoc(prop) or '')} |"
+        )
     return "\n".join(rows)
 
 
@@ -291,7 +297,14 @@ def class_section(
     if init_args and not dataclasses.is_dataclass(cls):
         parts.extend(["", "### Parameters", "", parameters_table(init_args)])
     if dataclasses.is_dataclass(cls):
-        parts.extend(["", "### Fields", "", dataclass_fields_section(cls, attribute_descriptions)])
+        parts.extend(
+            [
+                "",
+                "### Fields",
+                "",
+                dataclass_fields_section(cls, attribute_descriptions),
+            ]
+        )
     if properties:
         parts.extend(["", "### Properties", "", property_section(cls, properties)])
     for method_name in methods:
