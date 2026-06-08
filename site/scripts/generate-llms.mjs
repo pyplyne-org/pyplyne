@@ -140,7 +140,7 @@ PyPlyne code is ordinary-looking Python plus left-to-right pipe syntax. Files us
 the \`.pyplyne\` extension.
 
 - Shape annotations go on the right-hand side: \`name = seq expression\` or \`name = df expression\`.
-- \`seq\` means Python iterable data, especially lists and JSON-like records.
+- \`seq\` means non-string, non-mapping Python iterable data; Polars tables become row dictionaries.
 - \`df\` means table-shaped data; PyPlyne normalizes it to a Polars DataFrame.
 - Pipe with \`|>\`: \`source |> verb(args)\`.
 - Once a variable is known as \`seq\` or \`df\`, later pipelines can start from it.
@@ -186,7 +186,7 @@ result = numbers
   |> map(_ * 10)
 \`\`\`
 
-For JSON-like records, bare field names are convenient inside sequence verbs:
+For JSON-like records, bare field names are convenient inside record filters and updates:
 
 \`\`\`pyplyne
 orders = seq [
@@ -208,6 +208,9 @@ Common sequence verbs:
 - \`set_fields(name = expr, ...)\`: add/replace fields on record dictionaries.
 - \`drop_fields(field, ...)\`: remove fields from record dictionaries.
 - \`keep_fields(field, ...)\`: project fields from record dictionaries.
+- In \`filter(...)\`, bare names can read dictionary fields or object attributes.
+- In record field verbs, rows must be dictionaries.
+- Missing fields are boolean-false; \`==\` and ordering comparisons do not match, while \`!=\` matches.
 
 ## Moving Between Tables And Sequences
 

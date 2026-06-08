@@ -13,6 +13,14 @@ uv run ruff format --check .
 uv run pytest --cov=pyplyne --cov-report=term-missing
 ```
 
+Install the local pre-commit hook if you want the same core checks to run before
+each commit:
+
+```bash
+uv run pre-commit install
+uv run pre-commit run --all-files
+```
+
 The docs site lives in `site/`:
 
 ```bash
@@ -20,6 +28,8 @@ cd site
 npm install
 npm run docs:check
 ```
+
+The docs site requires Node 20 or newer.
 
 ## Pull Requests
 
@@ -30,7 +40,12 @@ npm run docs:check
 - Run `uv run pytest --cov=pyplyne --cov-report=term-missing` before opening a
   pull request.
 - Run `npm run docs:check` from `site/` when changing docs, examples, editor
-  grammar files, or docs generation scripts.
+  grammar files, or docs generation scripts. It regenerates generated docs.
+- Run `npm run docs:check:clean` from `site/` before release or CI-style
+  verification when you want to fail if generated artifacts drift.
+- The pre-commit hook runs `uv run ruff check .`, `uv run ruff format --check .`,
+  `uv run pytest --cov=pyplyne --cov-report=term-missing`, and
+  `npm --prefix site run docs:check`.
 
 ## Releases And Versions
 

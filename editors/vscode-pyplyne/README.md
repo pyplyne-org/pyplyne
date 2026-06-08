@@ -3,7 +3,8 @@
 VS Code support for `.pyplyne` files.
 
 This extension is currently installed from this repository. Marketplace
-publishing is pending.
+publishing is pending. Packaged user installation is tracked in
+https://github.com/pyplyne-org/pyplyne/issues/4.
 
 It provides syntax highlighting, editor commands, default keybindings,
 diagnostics, and a lightweight interactive execution loop backed by
@@ -13,6 +14,10 @@ diagnostics, and a lightweight interactive execution loop backed by
 
 Install PyPlyne in the project where you write `.pyplyne` files first. The
 extension starts sessions with `uv run pyplyne` by default.
+
+This is a development/source-checkout install path. VS Code does not install an
+extension directly from a GitHub subdirectory; a `.vsix`, Marketplace, or Open
+VSX package is the intended follow-up.
 
 From a source checkout of this repository, symlink the extension into VS Code:
 
@@ -86,3 +91,10 @@ Default keybindings:
 Results appear in the `PyPlyne` output panel. Errors use the same readable
 diagnostics as `pyplyne send`, and the extension publishes the error location to
 VS Code's Problems view when the session response includes a source line.
+Problem locations are reliable for full-file runs. For selections, current
+blocks, current lines, and assignment runs, diagnostic lines are relative to the
+snippet sent to the session.
+
+`PyPlyne: Stop Session` stops only a server process started by this VS Code
+extension instance. It does not stop an unrelated `pyplyne serve` process
+already running on the same port.

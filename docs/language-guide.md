@@ -12,7 +12,7 @@ PyPlyne has two main pipeline shapes:
 
 | Shape | Use it for | Main verbs |
 | --- | --- | --- |
-| `seq` | Python iterables, especially JSON-like records/lists | `map`, `filter`, `reduce`, `set_fields`, `drop_fields`, `keep_fields` |
+| `seq` | Non-string, non-mapping Python iterables; Polars tables become row dictionaries | `map`, `filter`, `reduce`, `set_fields`, `drop_fields`, `keep_fields` |
 | `df` | Polars-backed table data | `where`, `mutate`, `select`, `group_by`, `summarize`, `arrange` |
 
 The shape determines which verbs are available and how expressions are
@@ -59,12 +59,13 @@ annotate the source so PyPlyne knows which verb family applies.
 
 Shape annotations also validate or normalize values at runtime. `df [...]`
 turns row dictionaries into a Polars DataFrame. `seq ...` checks that the value
-is iterable rather than a single mapping or scalar.
+is a non-string, non-mapping iterable rather than a single mapping, string-like
+value, or scalar. Polars tables annotated as `seq` become row dictionaries.
 
 ## Work With Sequences
 
-Use `seq` for Python iterables. Sequence verbs evaluate Python expressions over
-the items in the iterable:
+Use `seq` for non-string, non-mapping Python iterables. Sequence verbs evaluate
+Python expressions over the items in the iterable:
 
 ```pyplyne
 values = seq [1, 2, 3, 4]
@@ -132,29 +133,39 @@ Record helpers:
 - `drop_fields(field, ...)` removes fields when present.
 - `keep_fields(field, ...)` projects records to selected fields.
 
-Inside record `filter(...)` and `set_fields(...)` expressions, bare names refer
-to dictionary fields or object attributes on the current record:
+Inside record `filter(...)` expressions, bare names can read dictionary fields
+or object attributes on the current item. Inside `set_fields(...)`, bare names
+read fields from row dictionaries, and the input rows must be dictionaries:
 
 ```pyplyne
 orders |> filter(qty > 1)
 orders |> set_fields(buy = item == "pens")
 ```
 
-If a bare field is missing, comparisons are falsy rather than crashing:
+If a bare field or attribute is missing in a filter, equality and ordering
+comparisons do not match, and `!=` does match:
 
 ```pyplyne
 orders |> filter(qty > 1)
 ```
 
-Rows without `qty` are skipped. Arithmetic still requires present values, so
-`set_fields(total = qty * price)` raises an error when `qty` or `price` is
-missing.
+Rows without `qty` are skipped by `qty > 1`; rows without `item` match
+`item != "pens"`. Missing fields are boolean-false, but arithmetic still
+requires present values, so `set_fields(total = qty * price)` raises an error
+when `qty` or `price` is missing.
 
 If you pass a single bare name to `filter`, PyPlyne treats it as an existing
 predicate function:
 
 ```pyplyne
 orders |> filter(is_priority)
+```
+
+For field truthiness, use a comparison or explicit row access instead:
+
+```pyplyne
+orders |> filter(active == True)
+orders |> filter(_["active"])
 ```
 
 Inside `map(...)`, use placeholders or explicit lambdas:

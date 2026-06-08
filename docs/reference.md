@@ -25,6 +25,8 @@ forms. For a learning path, use the [Language Guide](language-guide.md).
 ## Statements
 
 Each statement ends at a newline. Blank lines and `#` comments are ignored.
+Source strings and generated snippets should include a trailing newline, just
+like checked-in `.pyplyne` files.
 
 | Form | Syntax | Notes |
 | --- | --- | --- |
@@ -49,7 +51,7 @@ values at runtime.
 
 | Shape | Runtime data | Valid verb family |
 | --- | --- | --- |
-| `seq` | Python iterables, especially JSON-like records/lists | Sequence verbs and record field verbs |
+| `seq` | Non-string, non-mapping Python iterables; Polars tables become row dictionaries | Sequence verbs and record field verbs |
 | `df` | Polars-backed table data | Table verbs |
 | scalar | Any non-shaped value | No shape-specific verbs |
 
@@ -61,7 +63,9 @@ sales = df read_csv("sales.csv")
 ```
 
 `df [...]` turns row dictionaries into a Polars DataFrame. `seq ...` validates
-that the value is iterable and not a single mapping.
+that the value is a non-string, non-mapping iterable and not a single mapping,
+string-like value, or scalar. Polars tables annotated as `seq` become row
+dictionaries.
 
 The assigned name records the final shape of the whole expression:
 
@@ -195,17 +199,22 @@ Record field verb contracts:
 Field names in `drop_fields(...)` and `keep_fields(...)` may be bare names or
 strings. Keyword arguments are not accepted there.
 
-Inside `filter(...)` row expressions and `set_fields(...)`, bare names are
-rewritten to look up dictionary fields or object attributes on the current row:
+Inside `filter(...)` row expressions, bare names are rewritten to look up
+dictionary fields or object attributes on the current item. Inside
+`set_fields(...)`, bare names read dictionary fields, and the input rows must be
+dictionaries:
 
 ```pyplyne
 rows |> filter(amount > 100)
 rows |> set_fields(net=amount - discount, label=region + "-" + str(amount))
 ```
 
-Missing fields and attributes compare as falsy, so `filter(amount > 100)`
-skips rows without `amount`. Arithmetic still requires present values, so
-`set_fields(net=amount - discount)` errors if either field is missing.
+Missing fields and attributes are boolean-false. Equality and ordering
+comparisons do not match missing values, while `!=` does match them. For
+example, `filter(amount > 100)` skips rows without `amount`, and
+`filter(status != "closed")` keeps rows without `status`. Arithmetic still
+requires present values, so `set_fields(net=amount - discount)` errors if
+either field is missing.
 
 Use explicit lambdas when the callback should control row access itself:
 
@@ -249,6 +258,9 @@ Table expression rules:
 
 - Bare names such as `amount` compile to column references.
 - `and`, `or`, and `not` compile to Polars boolean expression operators.
+- Arbitrary Python/module calls are safest outside table verbs or after
+  `to_rows()`. Inside table verbs, bare names are interpreted as columns unless
+  they are recognized helpers or imported names that PyPlyne can preserve.
 - Keyword names in `mutate(...)` and `summarize(...)` become output column
   names.
 - `group_by(...)` must be followed by `summarize(...)` before the pipeline is
@@ -311,7 +323,9 @@ Read helpers create table-shaped values, so `df read_csv(...)` is usually
 redundant. Write helpers preserve the current pipeline value so writes can be
 chained.
 
-Read helpers return `df` values:
+Read helpers are shape-tracked as `df` values. Lazy readers such as
+`read_csv(...)` are materialized at ordinary assignment and expression
+boundaries unless the expression is prefixed with `defer`:
 
 - **`read_csv(path, option=value, ...)`** uses a `polars.scan_csv` lazy scan.
 - **`read_json(path, option=value, ...)`** uses `polars.read_json`.

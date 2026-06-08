@@ -457,7 +457,7 @@ def test_http_session_json_classifies_runtime_call_errors_and_keeps_prior_state(
 
 def test_http_session_json_classifies_runtime_file_errors(tmp_path):
     missing_path = tmp_path / "missing.csv"
-    payload = _post_json_error(f'missing = df read_csv("{missing_path}")\n')
+    payload = _post_json_error(f'missing = df read_csv("{missing_path.as_posix()}")\n')
 
     assert payload["ok"] is False
     assert payload["phase"] == "runtime"

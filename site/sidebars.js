@@ -35,10 +35,10 @@ const sidebars = {
       link: {
         type: 'generated-index',
         title: 'Work Interactively',
-        description: 'Use the CLI, persistent sessions, and the VS Code extension.',
+        description: 'Use persistent sessions, editor integrations, and CLI commands.',
       },
       collapsed: false,
-      items: ['cli', 'generated-cli-reference', 'interactive-sessions', 'editor'],
+      items: ['interactive-sessions', 'editor', 'cli', 'generated-cli-reference'],
     },
     {
       type: 'category',
@@ -60,7 +60,7 @@ const sidebars = {
         description: 'Architecture and maintainer notes.',
       },
       collapsed: true,
-      items: ['architecture', 'release-versioning', 'sites-used-for-inspiration'],
+      items: ['architecture', 'release-versioning'],
     },
   ],
 };

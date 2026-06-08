@@ -1,6 +1,7 @@
 ---
 title: Sites Used For Inspiration
 description: Python documentation sites that informed PyPlyne's documentation structure.
+unlisted: true
 ---
 
 # Sites Used For Inspiration

@@ -18,3 +18,4 @@ site-homepage*.png
 site/.docusaurus/
 site/build/
 site/node_modules/
+.local/

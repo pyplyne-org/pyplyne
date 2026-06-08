@@ -103,6 +103,12 @@ uv run pyplyne send --expr 'numbers = seq [1, 2, 3]'
 uv run pyplyne send --expr 'numbers |> map(_ * 10)'
 ```
 
+If no server is running yet, start one in another terminal:
+
+```bash
+uv run pyplyne serve --port 8765
+```
+
 Send a file when the snippet is easier to maintain on disk:
 
 ```bash
@@ -154,6 +160,10 @@ file. `--filename` is accepted as a compatibility alias.
 In session examples, `_` may mean either the last expression result or the
 current item inside a sequence callback. See [Last Result](interactive-sessions.md#last-result)
 for the distinction.
+
+For recovery details after failed snippets, see
+[State After Errors](interactive-sessions.md#state-after-errors) and
+[Interactive Sessions troubleshooting](troubleshooting.md#interactive-sessions).
 
 ## Exact Help
 

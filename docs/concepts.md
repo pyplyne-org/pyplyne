@@ -41,7 +41,7 @@ PyPlyne distinguishes two pipeline shapes:
 
 | Shape | Mental model | Main verbs |
 | --- | --- | --- |
-| `seq` | Python iterables, especially JSON-like records/lists | `map`, `filter`, `reduce`, `set_fields`, `drop_fields`, `keep_fields` |
+| `seq` | Non-string, non-mapping Python iterables; Polars tables become row dictionaries | `map`, `filter`, `reduce`, `set_fields`, `drop_fields`, `keep_fields` |
 | `df` | a table of rows and columns | `where`, `mutate`, `select`, `group_by`, `summarize`, `arrange` |
 
 Shape annotations go on the right-hand side:
@@ -53,10 +53,11 @@ sales = df read_csv("sales.csv")
 
 A shape is not a Python type annotation. It tells PyPlyne how to compile the
 pipeline that follows, and it normalizes or validates values at runtime.
-`df [...]` becomes a Polars DataFrame; `seq ...` checks that the value is an
-iterable rather than a single mapping or scalar. If a variable is already known
-to be `seq` or `df`, later pipelines can start from that variable without
-repeating the annotation:
+`df [...]` becomes a Polars DataFrame; `seq ...` checks that the value is a
+non-string, non-mapping iterable rather than a scalar or single record. Polars
+tables annotated as `seq` are converted to row dictionaries. If a variable is
+already known to be `seq` or `df`, later pipelines can start from that variable
+without repeating the annotation:
 
 ```pyplyne
 large_sales = sales |> where(amount > 100)
@@ -70,7 +71,8 @@ annotate the source with `seq` or `df` so PyPlyne knows which verb family applie
 ## Sequence Pipelines Transform Items
 
 Use `seq` when each step should work item by item. The value can be a list,
-tuple, generator, API response, or any other Python iterable.
+tuple, generator, API response, or another non-string, non-mapping Python
+iterable.
 
 ```pyplyne
 values = seq [1, 2, 3, 4]
@@ -97,8 +99,9 @@ restock = orders
   |> set_fields(buy = item == "pens")
 ```
 
-Inside record `filter(...)` and `set_fields(...)` expressions, bare names refer
-to fields on the current record:
+Inside record `filter(...)` expressions, bare names can read dictionary fields
+or object attributes on the current item. Inside `set_fields(...)`, bare names
+read fields from row dictionaries, and the input rows must be dictionaries:
 
 ```pyplyne
 rows |> filter(amount > 100)

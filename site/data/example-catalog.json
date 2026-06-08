@@ -33,6 +33,7 @@
     "title": "Run The Full Language Tour",
     "file": "examples/full_language_tour.pyplyne",
     "description": "Use this as an end-to-end smoke test: it combines imports, sequence and table verbs, grouped summaries, deferred pipelines, shape conversion, and CSV output.",
-    "concepts": ["end-to-end tour", "imports", "sequence verbs", "table verbs", "group_by() and summarize()", "defer pipeline", "write_csv() output"]
+    "concepts": ["end-to-end tour", "imports", "sequence verbs", "table verbs", "group_by() and summarize()", "defer pipeline", "write_csv() output"],
+    "outputs": ["examples/full_language_tour_output.csv"]
   }
 ]

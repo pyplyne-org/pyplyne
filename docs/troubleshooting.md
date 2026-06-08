@@ -22,6 +22,13 @@ Use text diagnostics when reading failures by hand:
 uv run pyplyne send --expr 'rows |> where(amount > 0)'
 ```
 
+`pyplyne send` targets a running session server. Start one in another terminal
+first, or use `uv run pyplyne run file.pyplyne` for one-shot file debugging:
+
+```bash
+uv run pyplyne serve --port 8765
+```
+
 Use JSON when another tool, editor, or test needs structured fields:
 
 ```bash

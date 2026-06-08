@@ -37,9 +37,9 @@ pyplyne> numbers |> map(_ * 10)
 ```
 
 The REPL runs complete snippets as they are entered. A single-line expression
-runs immediately. A simple assignment block can continue across lines; finish it
-with a blank line. Use `:paste` when you already have a multi-line snippet on
-the clipboard.
+runs immediately. Assignment-only input, including a one-line assignment, runs
+after a blank line because assignments can continue across following pipeline
+lines. Use `:paste` when you already have a multi-line snippet on the clipboard.
 
 Useful commands:
 
@@ -96,6 +96,10 @@ Send snippets into the same live session:
 uv run pyplyne send --expr 'numbers = seq [1, 2, 3]'
 uv run pyplyne send --expr 'numbers |> map(_ * 10)'
 ```
+
+`pyplyne send` requires a running `pyplyne serve` process. If no editor or
+script has already started one, run `uv run pyplyne serve --port 8765` in
+another terminal first.
 
 Send a file when the source is easier to maintain on disk:
 
@@ -226,6 +230,10 @@ ssh -L 8765:127.0.0.1:8765 user@remote
 PYPLYNE_URL=http://127.0.0.1:8765 uv run pyplyne send --expr 'sales'
 ```
 
+Concurrent HTTP requests share one session and are serialized while they run.
+That keeps the session environment consistent, but long-running snippets can
+delay later requests.
+
 ## Last Result
 
 Expression snippets store their final expression result as `_`, following the
@@ -320,3 +328,16 @@ status, so clients should read the response body even when their HTTP library
 raises an error. The full traceback is kept in JSON output and on the execution
 result for deeper debugging, while the human text path shows the focused
 diagnostic first.
+
+## State After Errors
+
+Parse and compile failures do not execute the snippet. They should not create
+new Python values, and the session reconciles shape metadata with names that
+still exist.
+
+Runtime failures happen after generated Python has started running. If a
+multi-statement snippet succeeds for earlier statements and then fails later,
+the earlier successful statements can remain in the session environment. Use
+`:vars`, `:shapes`, JSON `shapes`, or a fresh session to confirm state before
+continuing. When in doubt, restart the session or rerun the full setup file from
+top to bottom.

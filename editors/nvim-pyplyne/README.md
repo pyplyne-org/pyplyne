@@ -3,7 +3,8 @@
 Neovim support for `.pyplyne` files.
 
 This plugin is currently installed from this repository. Package-manager
-publishing is pending.
+publishing is pending. A cleaner GitHub/LazyVim install path is tracked in
+https://github.com/pyplyne-org/pyplyne/issues/5.
 
 It registers the `pyplyne` filetype, wires the local Tree-sitter grammar into
 `nvim-treesitter`, provides highlight/indent queries, and adds interactive
@@ -25,6 +26,11 @@ remains the Lark grammar in `src/pyplyne/grammar.lark`.
 
 Install PyPlyne in the project where you write `.pyplyne` files first. The
 plugin runs `uv run pyplyne` by default.
+
+This is a local source-checkout install path. Lazy.nvim can install plugins from
+GitHub, but this plugin currently lives in the nested `editors/nvim-pyplyne`
+directory inside the main repo, so a clean GitHub install recipe needs follow-up
+packaging or runtime-path work.
 
 Create `~/.config/nvim/lua/plugins/pyplyne.lua`:
 
@@ -107,6 +113,23 @@ opts = {
 ```
 
 Set any mapping to `false` to disable it.
+
+## Options
+
+`require("pyplyne").setup(opts)` accepts:
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `executable` | `"uv"` | Program used to start PyPlyne. |
+| `executable_args` | `{ "run", "pyplyne" }` | Arguments before the PyPlyne subcommand. |
+| `host` | `"127.0.0.1"` | Session host. |
+| `port` | `8765` | Session port. |
+| `startup_timeout_ms` | `30000` | Time to wait for a started server. |
+| `request_timeout_ms` | `30000` | Time to wait for snippet responses. |
+| `auto_start_server` | `true` | Start a server automatically before commands. |
+| `register_treesitter` | `true` | Register the local parser with nvim-treesitter. |
+| `parser_url` | `nil` | Override the parser source path or URL. |
+| `keymaps` | default mapping table | Configure or disable buffer-local mappings. |
 
 ## Parser Only
 

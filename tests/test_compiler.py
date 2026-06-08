@@ -1,4 +1,5 @@
 import ast
+import json
 from pathlib import Path
 
 import polars as pl
@@ -31,6 +32,14 @@ message = "north\nsouth"
     )
 
     assert env["message"] == "north\nsouth"
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def run_example_file(path: str):
+    with pl.Config(tbl_formatting="ASCII_FULL"):
+        return run_file(path)
 
 
 def test_list_pipeline_runs():
@@ -217,6 +226,58 @@ result = rows |> filter(qty > 1)
     )
 
     assert env["result"] == [{"item": "coffee", "qty": 3}]
+
+
+def test_sequence_filter_sparse_json_rows_has_explicit_missing_field_semantics():
+    env = run_source(
+        """
+events = seq [
+  {"id": 1, "status": "open"},
+  {"id": 2},
+  {"id": 3, "status": "closed"},
+  {"id": 4, "status": "open"},
+]
+open_events = events |> filter(status == "open") |> keep_fields(id)
+not_closed_events = events |> filter(status != "closed") |> keep_fields(id)
+status_flags = events |> set_fields(is_open = status == "open")
+""",
+        filename="sequence_sparse_json_missing_field_test.pyplyne",
+    )
+
+    assert env["open_events"] == [{"id": 1}, {"id": 4}]
+    assert env["not_closed_events"] == [{"id": 1}, {"id": 2}, {"id": 4}]
+    assert env["status_flags"] == [
+        {"id": 1, "status": "open", "is_open": True},
+        {"id": 2, "is_open": False},
+        {"id": 3, "status": "closed", "is_open": False},
+        {"id": 4, "status": "open", "is_open": True},
+    ]
+
+
+def test_sequence_filter_typoed_or_renamed_bare_field_is_treated_as_missing():
+    env = run_source(
+        """
+events = seq [
+  {"id": 1, "status": "open"},
+  {"id": 2, "status": "closed"},
+]
+typoed_open = events |> filter(stauts == "open")
+typoed_not_closed = events |> filter(stauts != "closed") |> keep_fields(id)
+two_missing_equal = events |> filter(nonsense1 == nonsense2)
+two_missing_not_equal = events |> filter(nonsense1 != nonsense2) |> keep_fields(id)
+typoed_flags = events |> set_fields(is_open = stauts == "open")
+""",
+        filename="sequence_typoed_missing_field_test.pyplyne",
+    )
+
+    assert env["typoed_open"] == []
+    assert env["typoed_not_closed"] == [{"id": 1}, {"id": 2}]
+    assert env["two_missing_equal"] == []
+    assert env["two_missing_not_equal"] == [{"id": 1}, {"id": 2}]
+    assert env["typoed_flags"] == [
+        {"id": 1, "status": "open", "is_open": False},
+        {"id": 2, "status": "closed", "is_open": False},
+    ]
 
 
 def test_sequence_set_fields_missing_bare_record_field_comparisons_do_not_crash():
@@ -618,13 +679,13 @@ def test_read_csv_write_csv_collect_and_shape_conversions(tmp_path):
 
     env = run_source(
         f"""
-sales = df read_csv("{input_path}")
+sales = df read_csv("{input_path.as_posix()}")
 summary = sales
   |> where(amount > 100)
   |> group_by(region)
   |> summarize(total=sum(amount))
   |> arrange(region)
-summary |> write_csv("{output_path}")
+summary |> write_csv("{output_path.as_posix()}")
 collected = summary |> collect()
 rows = summary |> to_rows()
 table = rows |> to_table()
@@ -656,16 +717,16 @@ def test_read_write_json_and_parquet_helpers_preserve_df_pipelines(tmp_path):
 
     env = run_source(
         f"""
-sales = df read_json("{json_path}")
+sales = df read_json("{json_path.as_posix()}")
 summary = sales
   |> where(amount > 100)
   |> mutate(net=amount - discount)
   |> select(region, amount, net)
   |> arrange(region)
 summary
-  |> write_parquet("{parquet_path}")
-  |> write_csv("{csv_path}")
-from_parquet = df read_parquet("{parquet_path}")
+  |> write_parquet("{parquet_path.as_posix()}")
+  |> write_csv("{csv_path.as_posix()}")
+from_parquet = df read_parquet("{parquet_path.as_posix()}")
 """,
         filename="json_parquet_io_test.pyplyne",
     )
@@ -854,7 +915,7 @@ def test_full_language_tour_example_runs():
     if output_path.exists():
         output_path.unlink()
 
-    env = run_file("examples/full_language_tour.pyplyne")
+    env = run_example_file("examples/full_language_tour.pyplyne")
 
     assert env["sequence_total"] == 180
     assert isinstance(env["summary"], pl.DataFrame)
@@ -868,7 +929,7 @@ def test_full_language_tour_example_runs():
 
 
 def test_shape_conversions_example_runs():
-    env = run_file("examples/shape_conversions.pyplyne")
+    env = run_example_file("examples/shape_conversions.pyplyne")
 
     assert env["labels"] == ["north", "north"]
     assert env["reviewed"].to_dicts() == [
@@ -878,7 +939,7 @@ def test_shape_conversions_example_runs():
 
 
 def test_record_fields_example_runs():
-    env = run_file("examples/record_fields.pyplyne")
+    env = run_example_file("examples/record_fields.pyplyne")
 
     assert env["with_fields"][0] == {
         "region": "north",
@@ -916,10 +977,33 @@ def test_record_fields_example_runs():
 
 
 def test_polars_constructor_example_runs():
-    env = run_file("examples/polars_constructor.pyplyne")
+    env = run_example_file("examples/polars_constructor.pyplyne")
 
     assert isinstance(env["sales"], pl.DataFrame)
     assert env["large_sales"].to_dicts() == [
         {"region": "north", "amount": 120},
         {"region": "north", "amount": 220},
     ]
+
+
+@pytest.mark.parametrize(
+    "example",
+    json.loads(
+        (PROJECT_ROOT / "site" / "data" / "example-catalog.json").read_text(
+            encoding="utf-8"
+        )
+    ),
+    ids=lambda example: example["file"],
+)
+def test_cataloged_examples_run(example):
+    for output in example.get("outputs", []):
+        output_path = PROJECT_ROOT / output
+        if output_path.exists():
+            output_path.unlink()
+
+    run_example_file(example["file"])
+
+    for output in example.get("outputs", []):
+        output_path = PROJECT_ROOT / output
+        assert output_path.exists()
+        output_path.unlink()

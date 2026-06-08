@@ -1,0 +1,26 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: Ruff lint
+        entry: uv run ruff check .
+        language: system
+        pass_filenames: false
+
+      - id: ruff-format-check
+        name: Ruff format check
+        entry: uv run ruff format --check .
+        language: system
+        pass_filenames: false
+
+      - id: pytest
+        name: Pytest
+        entry: uv run pytest --cov=pyplyne --cov-report=term-missing
+        language: system
+        pass_filenames: false
+
+      - id: docs-check
+        name: Docs check
+        entry: npm --prefix site run docs:check
+        language: system
+        pass_filenames: false
