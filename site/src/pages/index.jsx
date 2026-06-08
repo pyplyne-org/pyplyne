@@ -33,15 +33,15 @@ Prism.languages.bash = Prism.languages.bash || {
 
 const features = [
   {
-    label: 'Pipeline syntax',
-    title: 'Read transformations left to right.',
-    text: 'Pipe data through named steps instead of nesting function calls or spreading a simple flow across temporary variables.',
+    label: 'Pipeline language',
+    title: 'Write clean pipelines in Python.',
+    text: 'Use a small pipeline language for named, left-to-right steps instead of nested function calls or scattered temporary variables.',
     href: '/docs/language-guide',
   },
   {
     label: 'Two data shapes',
     title: 'Use df for tables and seq for records.',
-    text: 'Table pipelines are Polars-backed. Sequence pipelines work well for lists of JSON-like Python records.',
+    text: 'Choose the pipeline shape that matches your data: table workflows with df, record-list workflows with seq.',
     href: '/docs/reference',
   },
   {
@@ -74,11 +74,11 @@ const installLinks = [
 const workflowSections = [
   {
     label: 'Write a pipeline file',
-    title: 'Put the transformation in a .pyplyne script and run it once.',
-    text: 'Start with the simplest workflow: write a pipeline file, import the Python helpers you already trust, then run it from the command line.',
+    title: 'Write a .pyplyne pipeline script and run it once.',
+    text: 'Start with the simplest workflow: write clean pipeline code, import the Python helpers you already trust, then run it from the command line.',
     points: [
       'Use normal Python imports at the top of the file.',
-      'Write one readable table or sequence pipeline.',
+      'Write one readable pipeline for tables or records.',
       'Run the script with the PyPlyne CLI.',
     ],
     href: '/docs/quickstart',
@@ -248,7 +248,7 @@ const sequenceCode = [
 
 const sequenceSteps = [
   {
-    label: 'Start with a list of JSON-like order records.',
+    label: 'Start with a list of order records.',
     value: sequenceInput,
   },
   {
@@ -578,11 +578,11 @@ function HomepageHeader() {
         <section className={styles.heroCopy}>
           <div className={styles.brandLockup}>
             <h1>PyPlyne</h1>
-            <p className={styles.kicker}>Clean functional pipes, directly in Python</p>
+            <p className={styles.kicker}>A language for clean pipelines in Python</p>
           </div>
           <p className={styles.lede}>
-            Write data transformations left to right for Polars tables and
-            JSON-like records, without leaving Python.
+            Write clean, readable data pipelines as small scripts that run
+            with the Python code and tools you already use.
           </p>
           <div className={styles.actions}>
             <Link
@@ -661,13 +661,13 @@ export default function Home() {
   return (
     <Layout
       title="PyPlyne"
-      description="Clean functional pipes for Python data transformations.">
+      description="A language for writing clean data pipelines in Python.">
       <HomepageHeader />
       <main>
         <section className={styles.featureBand}>
           <div className={styles.sectionIntro}>
             <p className={styles.sectionLabel}>What it gives you</p>
-            <h2>A readable layer over everyday data work.</h2>
+            <h2>A small language layer for everyday Python data work.</h2>
           </div>
           <div className={styles.featureGrid}>
             {features.map((feature) => (
