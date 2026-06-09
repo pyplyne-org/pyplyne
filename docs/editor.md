@@ -5,12 +5,11 @@ description: VS Code and Neovim support for PyPlyne files.
 
 # Editor Support
 
-PyPlyne has editor support for VS Code and Neovim, but the editor plugins are
-currently installed from this repository. Marketplace and package-manager
-publishing are still pending. Track packaged VS Code installation in
-[issue #4](https://github.com/pyplyne-org/pyplyne/issues/4) and a cleaner
-LazyVim/GitHub install path in
-[issue #5](https://github.com/pyplyne-org/pyplyne/issues/5).
+PyPlyne has editor support for VS Code and Neovim. VS Code support currently
+uses a source-checkout install path; track packaged VS Code installation in
+[issue #4](https://github.com/pyplyne-org/pyplyne/issues/4). Neovim support
+lives in [`pyplyne-org/pyplyne.nvim`](https://github.com/pyplyne-org/pyplyne.nvim)
+and can be installed directly with Lazy.nvim or LazyVim.
 
 Install PyPlyne in the project where you write `.pyplyne` files first. The
 editor integrations start or connect to `pyplyne serve`, so the PyPlyne CLI must
@@ -93,7 +92,7 @@ Default keybindings:
 
 ## Neovim
 
-The local Neovim plugin registers the `pyplyne` filetype, wires the Tree-sitter
+The Neovim plugin registers the `pyplyne` filetype, wires the Tree-sitter
 grammar into `nvim-treesitter`, provides highlight/indent queries, and adds
 interactive commands backed by `pyplyne serve`.
 
@@ -108,19 +107,12 @@ Requirements:
 
 ### Install With LazyVim
 
-This is a local source-checkout install path. Lazy.nvim can install plugins from
-GitHub, but this plugin currently lives in the nested
-`editors/nvim-pyplyne` directory, so a clean GitHub install recipe needs follow-up
-packaging or runtime-path work. Track that work in
-[issue #5](https://github.com/pyplyne-org/pyplyne/issues/5).
-
 Create `~/.config/nvim/lua/plugins/pyplyne.lua`:
 
 ```lua
 return {
   {
-    dir = "/path/to/pyplyne/editors/nvim-pyplyne",
-    name = "pyplyne.nvim",
+    "pyplyne-org/pyplyne.nvim",
     lazy = false,
     opts = {},
     config = function(_, opts)
@@ -190,8 +182,9 @@ local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 
 parser_config.pyplyne = {
   install_info = {
-    url = "/path/to/pyplyne/editors/nvim-pyplyne/tree-sitter-pyplyne",
+    url = "https://github.com/pyplyne-org/pyplyne.nvim",
     files = { "src/parser.c" },
+    location = "tree-sitter-pyplyne",
     generate_requires_npm = true,
     requires_generate_from_grammar = true,
   },
