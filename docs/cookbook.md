@@ -16,6 +16,8 @@ assumptions that matter when you change it.
   against a warm session with `uv run pyplyne send --expr '...'`.
 - Example filenames such as `sales.csv`, `orders.json`, and `sales.xlsx` are
   placeholders. Replace them with paths that exist in your project.
+- Write helpers do not create parent directories. Create directories such as
+  `build/` before writing into them.
 - Example table columns use common names: `region`, `amount`, `discount`,
   `customer_id`, `order_id`, and `status`.
 - `df` pipelines use table verbs: `where`, `mutate`, `select`, `group_by`,
@@ -72,6 +74,7 @@ materialize or assign the result.
 
 **When to use this:** you want one cleaned table to feed different consumers.
 For example, CSV for a person, Parquet for another pipeline, and JSON for an app.
+Create the `build/` directory before running the writes.
 
 ```pyplyne
 summary = df read_csv("sales.csv")
@@ -145,6 +148,8 @@ iterable or literal list of records.
 
 **When to use this:** you have records from Python, an API, or a previous
 `to_rows()` step and need to shape them before table aggregation.
+This recipe assumes `orders` is an existing Python iterable of row dictionaries
+in the current session or Python API context.
 
 ```pyplyne
 clean_rows = seq orders
@@ -218,6 +223,8 @@ same expression.
 
 **When to use this:** Python already has the domain logic and PyPlyne is the
 composition layer.
+This recipe assumes Python has already defined an `orders` iterable and a
+`score_order` function.
 
 Seed a session from Python:
 

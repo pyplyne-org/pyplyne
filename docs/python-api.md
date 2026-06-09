@@ -6,7 +6,7 @@ description: Run PyPlyne from Python with PyPlyneSession, parse_source, and comp
 # Python API
 
 Use the Python API when you want to run PyPlyne inside another application,
-notebook, agent, or test suite. The public package exports:
+notebook, agent, or test suite. Common imports are:
 
 ```python
 from pyplyne import run, run_file, PyPlyneSession
@@ -15,7 +15,9 @@ from pyplyne import run, run_file, PyPlyneSession
 Use `run(...)` when you want a single isolated execution. Use
 `PyPlyneSession` when you want variables, imports, shapes, and the last result
 to persist across multiple snippets. The parser and compiler helpers are
-available for tools that need direct access to the generated Python AST.
+available for tools that need direct access to the generated Python AST. See
+the [Generated Python API Reference](generated-python-api-reference) for the
+full public export list and exact signatures.
 
 ## Choose An API
 
@@ -127,6 +129,19 @@ session.run(source_text, filename="orders.pyplyne")
 
 When constructing source strings yourself, include the same trailing newline a
 `.pyplyne` file would have.
+
+## Execution Options
+
+`run(...)`, `run_file(...)`, and `PyPlyneSession.run(...)` share the most common
+execution options:
+
+| Option | Effect |
+| --- | --- |
+| `capture_output=False` | Let stdout/stderr pass through to the process streams instead of storing them on the result. |
+| `raise_on_error=False` | Return a non-ok `PyPlyneExecutionResult` instead of raising parse, compile, or runtime failures. |
+| `store_result=False` | Skip storing the final expression result as `result.result` and session `_`. |
+
+Use the generated reference for the exact option set on each API.
 
 ## Retrieve Python Objects
 
@@ -265,9 +280,26 @@ result = session.load_file("pipeline.pyplyne")
 summary = result.result
 ```
 
-`run_file(...)` and `load_file(...)` use the default raising behavior. If you
-need non-raising file execution, read the file yourself and call
-`run(..., raise_on_error=False)`.
+`run_file(...)` accepts the same non-raising and output-capture options as
+`run(...)`:
+
+```python
+result = run_file("pipeline.pyplyne", raise_on_error=False)
+```
+
+`PyPlyneSession.load_file(...)` uses the default raising behavior. If you need
+non-raising file execution in an existing session, read the file yourself and
+call `session.run(..., raise_on_error=False)`:
+
+```python
+from pathlib import Path
+
+result = session.run(
+    Path("pipeline.pyplyne").read_text(encoding="utf-8"),
+    filename="pipeline.pyplyne",
+    raise_on_error=False,
+)
+```
 
 For command-line execution, use `pyplyne run` or the shorthand `pyplyne SCRIPT`.
 

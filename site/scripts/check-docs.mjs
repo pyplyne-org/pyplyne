@@ -3,12 +3,14 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
+import {buildExamplesDoc} from './generate-example-docs.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const siteDir = path.resolve(scriptDir, '..');
 const projectRoot = path.resolve(siteDir, '..');
 const docsDir = path.join(projectRoot, 'docs');
 const catalogPath = path.join(siteDir, 'data', 'example-catalog.json');
+const examplesDocPath = path.join(docsDir, 'examples.md');
 const llmsPath = path.join(siteDir, 'static', 'llms.txt');
 const sidebarsPath = path.join(siteDir, 'sidebars.js');
 const require = createRequire(import.meta.url);
@@ -121,6 +123,25 @@ function parseLlmsEntries(text) {
     .map((match) => ({title: match[1], route: match[2], description: match[3].trim()}));
 }
 
+function assertProjectRelative(relativePath, label) {
+  const absolutePath = path.resolve(projectRoot, relativePath);
+  const relativeToRoot = path.relative(projectRoot, absolutePath);
+  if (!relativeToRoot || relativeToRoot.startsWith('..') || path.isAbsolute(relativeToRoot)) {
+    failures.push(`${label} must stay inside the project root: ${relativePath}`);
+    return null;
+  }
+  return absolutePath;
+}
+
+function cleanupExampleOutputs(example) {
+  for (const output of example.outputs || []) {
+    const outputPath = assertProjectRelative(output, `Example output for ${example.file}`);
+    if (outputPath) {
+      fs.rmSync(outputPath, {force: true});
+    }
+  }
+}
+
 const failures = [];
 const markdownFiles = walkMarkdownFiles(docsDir);
 const docs = markdownFiles.map((filePath) => {
@@ -208,6 +229,13 @@ if (!fs.existsSync(llmsPath)) {
 }
 
 const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+const expectedExamplesDoc = buildExamplesDoc(catalog);
+if (!fs.existsSync(examplesDocPath)) {
+  failures.push('Missing generated examples docs: docs/examples.md');
+} else if (fs.readFileSync(examplesDocPath, 'utf8') !== expectedExamplesDoc) {
+  failures.push('docs/examples.md is stale. Run `npm run docs:examples` from site/.');
+}
+
 const catalogFiles = catalog.map((example) => example.file).filter(Boolean);
 const catalogTitles = catalog.map((example) => example.title).filter(Boolean);
 const exampleFiles = fs
@@ -243,18 +271,25 @@ for (const example of catalog) {
   if (!Array.isArray(example.concepts) || example.concepts.length === 0) {
     failures.push(`Example catalog entry needs at least one concept: ${example.file}`);
   }
+  if (example.outputs !== undefined && !Array.isArray(example.outputs)) {
+    failures.push(`Example catalog outputs must be an array when present: ${example.file}`);
+  }
   try {
+    cleanupExampleOutputs(example);
     execFileSync('uv', ['run', 'pyplyne', example.file], {
       cwd: projectRoot,
       encoding: 'utf8',
       env: {
         ...process.env,
+        POLARS_FMT_TABLE_FORMATTING: 'ASCII_FULL',
         PYTHONIOENCODING: 'utf-8',
       },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
   } catch (error) {
     failures.push(`Example failed to run: ${example.file}\n${error.stderr || error.stdout || error.message}`);
+  } finally {
+    cleanupExampleOutputs(example);
   }
 }
 

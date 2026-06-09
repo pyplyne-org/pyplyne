@@ -16,12 +16,14 @@ uv run pyplyne examples/list_pipeline.pyplyne
 ```
 
 Shows a `seq` annotation plus `filter` and `map`.
+Expected output: `[20, 40, 60]`.
 
 ```bash
 uv run pyplyne examples/tabular_pipeline.pyplyne
 ```
 
 Shows a `df` annotation plus Polars-backed `where`, `mutate`, and `select`.
+Expected output is a Polars table for the north rows over 100.
 
 ## Table Construction
 
@@ -30,6 +32,7 @@ uv run pyplyne examples/polars_constructor.pyplyne
 ```
 
 Imports Polars directly and annotates a `pl.DataFrame` as `df`.
+Expected output is a Polars table for the selected north rows.
 
 ## Shape Conversion
 
@@ -38,6 +41,7 @@ uv run pyplyne examples/shape_conversions.pyplyne
 ```
 
 Moves between `df` and `seq` with `to_rows()` and `to_table()`.
+Expected output includes `["north", "north"]` and a reviewed Polars table.
 
 ```bash
 uv run pyplyne examples/record_fields.pyplyne
@@ -45,6 +49,8 @@ uv run pyplyne examples/record_fields.pyplyne
 
 Shows `set_fields`, `drop_fields`, and `keep_fields` for manipulating
 sequences of row dictionaries.
+Expected output shows the fields added, the `debug` field removed, and the final
+projection.
 
 ## Full Tour
 

@@ -8,9 +8,7 @@ const projectRoot = path.resolve(siteDir, '..');
 const catalogPath = path.join(siteDir, 'data', 'example-catalog.json');
 const outputPath = path.join(projectRoot, 'docs', 'examples.md');
 
-const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
-
-function readExample(relativePath) {
+export function readExample(relativePath) {
   const absolutePath = path.join(projectRoot, relativePath);
   if (!fs.existsSync(absolutePath)) {
     throw new Error(`Example file does not exist: ${relativePath}`);
@@ -18,11 +16,11 @@ function readExample(relativePath) {
   return fs.readFileSync(absolutePath, 'utf8').trimEnd();
 }
 
-function bulletList(items) {
+export function bulletList(items) {
   return items.map((item) => `- ${item}`).join('\n');
 }
 
-function exampleSection(example) {
+export function exampleSection(example) {
   const code = readExample(example.file);
   return `## ${example.title}
 
@@ -41,11 +39,12 @@ ${code}
 \`\`\``;
 }
 
-const chooserRows = catalog
-  .map((example) => `| ${example.title} | \`${example.file}\` |`)
-  .join('\n');
+export function buildExamplesDoc(catalog) {
+  const chooserRows = catalog
+    .map((example) => `| ${example.title} | \`${example.file}\` |`)
+    .join('\n');
 
-const content = `---
+  return `---
 title: Examples
 description: Runnable PyPlyne examples included in the repository.
 ---
@@ -79,6 +78,14 @@ this page with \`npm run docs:examples\` from \`site/\`.
 
 :::
 `;
+}
 
-fs.writeFileSync(outputPath, content);
-console.log(`Generated ${path.relative(projectRoot, outputPath)} from ${catalog.length} examples.`);
+export function main() {
+  const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+  fs.writeFileSync(outputPath, buildExamplesDoc(catalog));
+  console.log(`Generated ${path.relative(projectRoot, outputPath)} from ${catalog.length} examples.`);
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  main();
+}

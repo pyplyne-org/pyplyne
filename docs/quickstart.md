@@ -42,10 +42,15 @@ available.
 
 If you use `pip`, install PyPlyne into a virtual environment:
 
-```bash
+```bash title="macOS/Linux"
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"
+```
+
+```powershell title="Windows PowerShell"
+py -3.13 -m venv .venv
+.\.venv\Scripts\python -m pip install "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"
 ```
 
 The commands below use `uv run pyplyne`. If you installed with `pip`, run
@@ -93,6 +98,8 @@ and `_` is the current item inside each verb.
 - Read [Core Concepts](concepts.md) for the mental model.
 - Read [Language Guide](language-guide.md) for table pipelines, files, and imports.
 - Read [Interactive Sessions](interactive-sessions.md) for the REPL and `pyplyne serve`.
+- Use [CLI Reference](cli.md) or [Generated CLI Help](generated-cli-reference.md) for command details.
+- Use [Editor Support](editor.md) for VS Code and Neovim integration.
 - Use [Examples](examples.md) and [Cookbook](cookbook.md) to copy working patterns.
 
 ## If You Cloned the Repository

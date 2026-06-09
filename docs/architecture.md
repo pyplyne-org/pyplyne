@@ -20,8 +20,8 @@ execution state for interactive workflows.
 
 ## Execution Pipeline
 
-PyPlyne has one compile-and-run path for files, the CLI, the REPL, and the HTTP
-session server:
+PyPlyne has one core parse/compile/exec pipeline with separate wrappers for
+files, the CLI, the REPL, Python API calls, and the HTTP session server:
 
 1. Parse: `parse_source()` reads PyPlyne source with the cached Lark parser from
    `grammar.lark`. The parser uses Earley parsing, resolves ambiguities, and
@@ -258,5 +258,5 @@ interpreted by a separate runtime.
 
 - A richer parser for broader Python expression coverage.
 - Static DAG extraction and visualization.
-- A language server and syntax highlighting.
+- Richer language-server features beyond the existing syntax highlighting.
 - Optional safety policy controls for sandboxed execution.

@@ -38,6 +38,7 @@ Issues = "https://github.com/pyplyne-org/pyplyne/issues"
 [project.optional-dependencies]
 dev = [
   "pandas>=2.2",
+  "pre-commit>=4.6.0",
   "pyarrow>=16",
   "pytest>=8",
   "pytest-cov>=7.1.0",

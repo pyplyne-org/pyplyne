@@ -41,10 +41,19 @@ commit by adding an `@ref` suffix to the Git URL when releases are available.
 
 If you use `pip`, install PyPlyne into a virtual environment:
 
+On macOS/Linux:
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"
+```
+
+On Windows PowerShell:
+
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\python -m pip install "pyplyne @ git+https://github.com/pyplyne-org/pyplyne.git"
 ```
 
 The commands below use `uv run pyplyne`. If you installed with `pip`, run
@@ -70,9 +79,9 @@ uv run pyplyne pipeline.pyplyne
 
 You should see `[20, 40, 60]`.
 
-Next, read the [Quickstart](docs/quickstart.md) or the
-[Language Guide](docs/language-guide.md) for table pipelines, files, and
-interactive workflows.
+For the full setup path, read the [Quickstart](docs/quickstart.md). For table
+pipelines, files, and interactive workflows, read the
+[Language Guide](docs/language-guide.md).
 
 ## Documentation
 
@@ -80,12 +89,16 @@ interactive workflows.
 - [Quickstart](docs/quickstart.md)
 - [Core concepts](docs/concepts.md)
 - [Language guide](docs/language-guide.md)
+- [Sequence patterns](docs/sequence-patterns.md)
 - [Language reference](docs/reference.md)
 - [CLI reference](docs/cli.md)
+- [Generated CLI help](docs/generated-cli-reference.md)
 - [Interactive sessions](docs/interactive-sessions.md)
 - [Examples](docs/examples.md)
-- [VS Code extension](docs/editor.md)
+- [Cookbook](docs/cookbook.md)
+- [Editor support](docs/editor.md)
 - [Python API](docs/python-api.md)
+- [Generated Python API reference](docs/generated-python-api-reference.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Architecture](docs/architecture.md)
 

@@ -7,7 +7,10 @@ description: VS Code and Neovim support for PyPlyne files.
 
 PyPlyne has editor support for VS Code and Neovim, but the editor plugins are
 currently installed from this repository. Marketplace and package-manager
-publishing are still pending.
+publishing are still pending. Track packaged VS Code installation in
+[issue #4](https://github.com/pyplyne-org/pyplyne/issues/4) and a cleaner
+LazyVim/GitHub install path in
+[issue #5](https://github.com/pyplyne-org/pyplyne/issues/5).
 
 Install PyPlyne in the project where you write `.pyplyne` files first. The
 editor integrations start or connect to `pyplyne serve`, so the PyPlyne CLI must
@@ -21,9 +24,15 @@ The local VS Code extension provides:
 - Command palette and context-menu actions for running source.
 - Default keybindings for line, selection, block, file, and assignment runs.
 - Diagnostics in the Problems view when a session response includes a source
-  location.
+  location. Locations are reliable for full-file runs; for selections, current
+  blocks, and current lines, reported lines are relative to the sent snippet.
 
 ### Install From This Repository
+
+This is a development/source-checkout install path. VS Code does not install an
+extension directly from a GitHub subdirectory the way Python package managers
+can install PyPlyne from Git. For a normal user install path, track
+[issue #4](https://github.com/pyplyne-org/pyplyne/issues/4).
 
 From a source checkout:
 
@@ -31,6 +40,16 @@ From a source checkout:
 mkdir -p ~/.vscode/extensions
 rm -f ~/.vscode/extensions/pyplyne.pyplyne-0.1.1
 ln -s "/path/to/pyplyne/editors/vscode-pyplyne" ~/.vscode/extensions/pyplyne.pyplyne-0.1.1
+```
+
+On Windows, copy or junction the extension folder into your VS Code extensions
+directory, for example:
+
+```powershell
+New-Item -ItemType Directory -Force $env:USERPROFILE\.vscode\extensions
+New-Item -ItemType Junction `
+  -Path $env:USERPROFILE\.vscode\extensions\pyplyne.pyplyne-0.1.1 `
+  -Target C:\path\to\pyplyne\editors\vscode-pyplyne
 ```
 
 Reload VS Code, open your Python project, then open a `.pyplyne` file. If the
@@ -89,6 +108,12 @@ Requirements:
 
 ### Install With LazyVim
 
+This is a local source-checkout install path. Lazy.nvim can install plugins from
+GitHub, but this plugin currently lives in the nested
+`editors/nvim-pyplyne` directory, so a clean GitHub install recipe needs follow-up
+packaging or runtime-path work. Track that work in
+[issue #5](https://github.com/pyplyne-org/pyplyne/issues/5).
+
 Create `~/.config/nvim/lua/plugins/pyplyne.lua`:
 
 ```lua
@@ -141,6 +166,20 @@ Terminal Neovim cannot reliably receive every `Ctrl+Enter` or
 `Ctrl+Shift+Enter` combination across terminals, so the plugin uses leader
 mappings by default. Override them through `opts.keymaps`.
 
+Useful options:
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `executable` | `"uv"` | Program used to start PyPlyne. |
+| `executable_args` | `{ "run", "pyplyne" }` | Arguments before the PyPlyne subcommand. |
+| `host` | `"127.0.0.1"` | Session host. |
+| `port` | `8765` | Session port. |
+| `startup_timeout_ms` | `30000` | Time to wait for a started server. |
+| `request_timeout_ms` | `30000` | Time to wait for snippet responses. |
+| `auto_start_server` | `true` | Start a server automatically before commands. |
+| `register_treesitter` | `true` | Register the local parser with nvim-treesitter. |
+| `parser_url` | `nil` | Override the parser source path or URL. |
+
 ### Parser Only
 
 If you only want Tree-sitter registration without the interactive commands, add
@@ -183,7 +222,11 @@ repository for install and Docusaurus setup.
 | Symptom | Check |
 | --- | --- |
 | Commands do not appear. | Confirm the file uses `.pyplyne`, then set the language mode to `PyPlyne` and reload the editor. |
-| The session fails to start. | Confirm `pyplyne run --help` works from the project root, or configure the editor to use the right executable. |
+| The session fails to start. | Confirm the configured command works from the project root, for example `uv run pyplyne run --help` or `pyplyne run --help`. |
 | `uv` cannot be found. | Install `uv`, open the editor from a shell with `uv` on `PATH`, or configure the editor to run `pyplyne` directly. |
 | Port `8765` is already in use. | Stop the other process or change the editor's configured PyPlyne port. |
 | Results use stale variables. | Restart the session or run the full file to rebuild state from top to bottom. |
+
+Editor stop commands only stop a server process started by that editor
+instance. They do not stop an unrelated `pyplyne serve` process already running
+on the same port.

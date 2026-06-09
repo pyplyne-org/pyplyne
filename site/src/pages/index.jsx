@@ -587,13 +587,13 @@ function HomepageHeader() {
           <div className={styles.actions}>
             <Link
               className={clsx(styles.heroButton, styles.primaryHeroButton)}
-              to="/docs/language-guide">
-              <span>Read the guide</span>
+              to="/docs/quickstart">
+              <span>Start quickstart</span>
             </Link>
             <Link
               className={clsx(styles.heroButton, styles.secondaryHeroButton)}
-              to="/docs/reference">
-              <span>Open reference</span>
+              to="/docs/language-guide">
+              <span>Read the guide</span>
             </Link>
           </div>
         </section>
