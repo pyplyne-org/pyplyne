@@ -27,7 +27,23 @@ const sidebars = {
         description: 'Understand PyPlyne concepts, syntax, examples, and workflows.',
       },
       collapsed: false,
-      items: ['concepts', 'language-guide', 'sequence-patterns', 'examples', 'cookbook'],
+      items: [
+        'concepts',
+        'language-guide',
+        'sequence-patterns',
+        'examples',
+        'cookbook',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Package Inspirations',
+      link: {
+        type: 'doc',
+        id: 'package-inspirations',
+      },
+      collapsed: false,
+      items: ['package-inspirations/purrr', 'package-inspirations/dplyr'],
     },
     {
       type: 'category',

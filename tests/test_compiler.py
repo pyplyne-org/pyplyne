@@ -986,6 +986,61 @@ def test_polars_constructor_example_runs():
     ]
 
 
+def test_purrr_map_sequence_parity_example_runs():
+    env = run_example_file("examples/parity/purrr_map_sequence.pyplyne")
+
+    assert env["messages"] == [
+        "banana bread rocks!",
+        "pancakes rocks!",
+        "chocolate cake rocks!",
+    ]
+
+
+def test_purrr_keep_records_parity_example_runs():
+    env = run_example_file("examples/parity/purrr_keep_records.pyplyne")
+
+    assert env["high_mean_samples"] == [
+        {"id": 1, "values": [6, 7, 9, 5, 8]},
+        {"id": 3, "values": [9, 8, 5, 2, 7]},
+    ]
+    assert env["active_samples"] == [{"id": 1}, {"id": 3}]
+
+
+def test_dplyr_filter_select_mutate_parity_example_runs():
+    env = run_example_file("examples/parity/dplyr_filter_select_mutate.pyplyne")
+
+    assert env["light_brown_eyes"].to_dicts() == [
+        {
+            "name": "Leia Organa",
+            "skin_color": "light",
+            "eye_color": "brown",
+        },
+        {
+            "name": "Biggs Darklighter",
+            "skin_color": "light",
+            "eye_color": "brown",
+        },
+    ]
+    assert env["with_bmi"].select("name").to_series().to_list() == [
+        "Biggs Darklighter",
+        "C-3PO",
+        "Leia Organa",
+        "Luke Skywalker",
+        "R2-D2",
+    ]
+    assert "bmi" in env["with_bmi"].columns
+
+
+def test_dplyr_group_summary_parity_example_runs():
+    env = run_example_file("examples/parity/dplyr_group_summary.pyplyne")
+
+    assert env["species_summary"].to_dicts() == [
+        {"species": "Droid", "rows": 2, "average_mass": 53.5},
+        {"species": "Gungan", "rows": 2, "average_mass": 74.0},
+        {"species": "Human", "rows": 3, "average_mass": 70.0},
+    ]
+
+
 @pytest.mark.parametrize(
     "example",
     json.loads(

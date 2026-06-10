@@ -1,0 +1,10 @@
+desserts = seq [
+  {"name": "Sophia", "food": "banana bread"},
+  {"name": "Eliott", "food": "pancakes"},
+  {"name": "Karina", "food": "chocolate cake"},
+]
+
+messages = desserts
+  |> map(_["food"] + " rocks!")
+
+print(messages)

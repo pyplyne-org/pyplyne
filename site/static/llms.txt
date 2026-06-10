@@ -197,6 +197,9 @@ session label.
 - [Sequence Patterns](/docs/sequence-patterns): Use PyPlyne seq pipelines with scalars, records, objects, functions, and mixed Python values.
 - [Examples](/docs/examples): Runnable PyPlyne examples included in the repository.
 - [Cookbook](/docs/cookbook): Task-shaped PyPlyne recipes for common data pipeline workflows.
+- [Package Inspirations](/docs/package-inspirations): PyPlyne examples inspired by existing data and functional pipeline packages.
+- [dplyr Examples](/docs/package-inspirations/dplyr): PyPlyne df examples inspired by dplyr documentation patterns.
+- [purrr Examples](/docs/package-inspirations/purrr): PyPlyne seq examples inspired by purrr documentation patterns.
 
 ### Runtime Interfaces
 
