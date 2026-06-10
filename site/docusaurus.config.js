@@ -48,6 +48,12 @@ const config = {
         {to: '/docs/quickstart', label: 'Quickstart', position: 'left'},
         {to: '/docs/reference', label: 'Reference', position: 'left'},
         {to: '/docs/interactive-sessions', label: 'Sessions', position: 'left'},
+        {
+          href: 'https://github.com/pyplyne-org/pyplyne',
+          position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'PyPlyne GitHub repository',
+        },
       ],
     },
     footer: {
