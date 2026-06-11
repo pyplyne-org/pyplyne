@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {Fragment, useCallback, useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
@@ -382,17 +382,19 @@ function useCyclingStep(length, shouldCycle = true) {
 function DemoCode({lines, step}) {
   return (
     <pre className={styles.demoCode}>
-      <code className="language-pyplyne">
+      <code>
         {lines.map((line, index) => (
-          <span
-            className={clsx(
-              styles.codeLine,
-              index === step && styles.activeCodeLine,
-              index > step && styles.pendingCodeLine,
-            )}
-            key={line}
-            dangerouslySetInnerHTML={{__html: highlightedHtml(line, 'pyplyne')}}
-          />
+          <Fragment key={line}>
+            <span
+              className={clsx(
+                styles.codeLine,
+                index === step && styles.activeCodeLine,
+                index > step && styles.pendingCodeLine,
+              )}
+              dangerouslySetInnerHTML={{__html: highlightedHtml(line, 'pyplyne')}}
+            />
+            {index < lines.length - 1 ? '\n' : null}
+          </Fragment>
         ))}
       </code>
     </pre>
