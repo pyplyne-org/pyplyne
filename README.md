@@ -95,6 +95,7 @@ pipelines, files, and interactive workflows, read the
 - [Generated CLI help](docs/generated-cli-reference.md)
 - [Interactive sessions](docs/interactive-sessions.md)
 - [Examples](docs/examples.md)
+- [Package inspirations](docs/package-inspirations.md)
 - [Cookbook](docs/cookbook.md)
 - [Editor support](docs/editor.md)
 - [Python API](docs/python-api.md)

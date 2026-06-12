@@ -63,3 +63,18 @@ shape conversion, and CSV output.
 
 The full tour writes `examples/full_language_tour_output.csv`; tests remove it
 after running.
+
+## Parity Examples
+
+These examples mirror selected purrr and dplyr documentation patterns so they
+can be used as focused functional parity checks:
+
+```bash
+uv run pyplyne examples/parity/purrr_map_sequence.pyplyne
+uv run pyplyne examples/parity/purrr_keep_records.pyplyne
+uv run pyplyne examples/parity/dplyr_filter_select_mutate.pyplyne
+uv run pyplyne examples/parity/dplyr_group_summary.pyplyne
+```
+
+See `docs/package-inspirations.md` for the upstream documentation links and the
+PyPlyne implementations side by side.

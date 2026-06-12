@@ -1,0 +1,17 @@
+starwars = df [
+  {"name": "Luke Skywalker", "species": "Human", "mass": 77},
+  {"name": "Leia Organa", "species": "Human", "mass": 49},
+  {"name": "Biggs Darklighter", "species": "Human", "mass": 84},
+  {"name": "C-3PO", "species": "Droid", "mass": 75},
+  {"name": "R2-D2", "species": "Droid", "mass": 32},
+  {"name": "Jar Jar Binks", "species": "Gungan", "mass": 66},
+  {"name": "Roos Tarpals", "species": "Gungan", "mass": 82},
+]
+
+species_summary = starwars
+  |> group_by(species)
+  |> summarize(rows=count(), average_mass=mean(mass))
+  |> where(rows > 1 and average_mass > 50)
+  |> arrange(species)
+
+print(species_summary.to_dicts())

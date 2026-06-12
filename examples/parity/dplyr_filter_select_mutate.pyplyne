@@ -1,0 +1,19 @@
+starwars = df [
+  {"name": "Luke Skywalker", "height": 172, "mass": 77, "skin_color": "fair", "eye_color": "blue", "species": "Human"},
+  {"name": "Leia Organa", "height": 150, "mass": 49, "skin_color": "light", "eye_color": "brown", "species": "Human"},
+  {"name": "Biggs Darklighter", "height": 183, "mass": 84, "skin_color": "light", "eye_color": "brown", "species": "Human"},
+  {"name": "C-3PO", "height": 167, "mass": 75, "skin_color": "gold", "eye_color": "yellow", "species": "Droid"},
+  {"name": "R2-D2", "height": 96, "mass": 32, "skin_color": "white, blue", "eye_color": "red", "species": "Droid"},
+]
+
+light_brown_eyes = starwars
+  |> where(skin_color == "light" and eye_color == "brown")
+  |> select(name, skin_color, eye_color)
+
+with_bmi = starwars
+  |> mutate(bmi=mass / ((height / 100) * (height / 100)))
+  |> select(name, height, mass, bmi)
+  |> arrange(name)
+
+print(light_brown_eyes.to_dicts())
+print(with_bmi.to_dicts())

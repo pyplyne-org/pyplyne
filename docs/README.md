@@ -117,7 +117,7 @@ compact pipeline style for filtering, mapping, and reshaping.
 - **Find exact syntax:** [Language Reference](reference.md)
 - **Use PyPlyne from Python:** [Python API](python-api.md)
 - **Run from a terminal or agent:** [CLI](cli.md)
-- **Copy working patterns:** [Examples](examples.md) and [Cookbook](cookbook.md)
+- **Copy working patterns:** [Examples](examples.md), [Package Inspirations](package-inspirations.md), and [Cookbook](cookbook.md)
 
 ## Reading Path
 
