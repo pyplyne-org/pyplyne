@@ -12,4 +12,5 @@ def test_homepage_demo_code_keeps_real_newlines_and_avoids_prism_rehighlight():
     demo_code_source = source[demo_code_start:demo_code_end]
 
     assert '<code className="language-pyplyne">' not in demo_code_source
-    assert r"{index < lines.length - 1 ? '\n' : null}" in demo_code_source
+    assert "styles.codeLineBreak" in demo_code_source
+    assert r"{'\n'}" in demo_code_source
