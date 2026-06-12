@@ -360,6 +360,10 @@
   transition: background-color 220ms ease, color 220ms ease, opacity 220ms ease;
 }
 
+.codeLineBreak {
+  display: none;
+}
+
 .activeCodeLine {
   background: rgba(118, 209, 155, 0.18);
   color: #ffffff;

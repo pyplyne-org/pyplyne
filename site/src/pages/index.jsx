@@ -393,7 +393,9 @@ function DemoCode({lines, step}) {
               )}
               dangerouslySetInnerHTML={{__html: highlightedHtml(line, 'pyplyne')}}
             />
-            {index < lines.length - 1 ? '\n' : null}
+            {index < lines.length - 1 ? (
+              <span className={styles.codeLineBreak}>{'\n'}</span>
+            ) : null}
           </Fragment>
         ))}
       </code>
